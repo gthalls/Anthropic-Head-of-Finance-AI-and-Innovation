@@ -1,0 +1,2046 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OMDA vs HNGE — Financial Analysis</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Questrial&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:       #F8F8FF;
+  --teal:     #003D48;
+  --burnt:    #C44F23;
+  --coral:    #F3693F;
+  --panel:    #FFFFFF;
+  --panel2:   #EFF0F7;
+  --line:     rgba(0,61,72,0.11);
+  --text:     #003D48;
+  --muted:    rgba(0,61,72,0.52);
+  --muted2:   rgba(0,61,72,0.30);
+  --pos:      #1A6B3A;
+  --neg:      #C44F23;
+  --gold:     #8B6914;
+  --na:       rgba(0,61,72,0.22);
+  --hnge:     #003D48;
+  --hnge-lt:  rgba(0,61,72,0.07);
+  --omda:     #C44F23;
+  --omda-lt:  rgba(196,79,35,0.07);
+}
+
+body {
+  font-family: 'Montserrat', 'Questrial', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  width: 1200px;
+  margin: 0 auto;
+  padding: 0 0 80px;
+}
+
+/* ── MASTHEAD ─────────────────────────────────── */
+.masthead {
+  padding: 52px 60px 42px;
+  border-bottom: 2.5px solid var(--teal);
+  position: relative;
+  overflow: hidden;
+}
+.masthead::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 500px 280px at -5% 130%, rgba(0,61,72,0.05) 0%, transparent 65%),
+    radial-gradient(ellipse 440px 260px at 108% 130%, rgba(196,79,35,0.05) 0%, transparent 65%);
+  pointer-events: none;
+}
+.masthead-inner { position: relative; z-index: 1; }
+.eyebrow { font-size: 9px; font-weight: 700; letter-spacing: .24em; color: var(--muted); text-transform: uppercase; margin-bottom: 22px; }
+.title-row { display: flex; align-items: flex-end; margin-bottom: 26px; }
+.company-pill { display: flex; flex-direction: column; gap: 5px; }
+.ticker { font-size: 80px; font-weight: 900; line-height: .87; letter-spacing: -2px; }
+.ticker.hnge { color: var(--hnge); }
+.ticker.omda { color: var(--omda); }
+.company-name { font-size: 9.5px; font-weight: 700; letter-spacing: .16em; color: var(--muted); text-transform: uppercase; }
+.vs-block { display: flex; align-items: center; justify-content: center; width: 80px; padding-bottom: 14px; flex-shrink: 0; }
+.vs-text { font-size: 15px; font-weight: 800; color: var(--muted2); letter-spacing: .08em; }
+.masthead-meta { display: flex; gap: 36px; flex-wrap: wrap; }
+.meta-item { display: flex; flex-direction: column; gap: 3px; }
+.meta-label { font-size: 8.5px; font-weight: 700; letter-spacing: .16em; color: var(--muted); text-transform: uppercase; }
+.meta-val { font-size: 11.5px; font-weight: 600; color: var(--text); }
+
+/* ── TAB BAR ──────────────────────────────────── */
+.tab-bar {
+  display: flex;
+  align-items: stretch;
+  border-bottom: 2px solid var(--line);
+  background: var(--panel);
+  padding: 0 60px;
+  gap: 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 24px 14px;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-bottom: 2.5px solid transparent;
+  margin-bottom: -2px;
+  transition: color .15s, border-color .15s;
+}
+.tab-btn:hover { color: var(--text); }
+.tab-btn.active { color: var(--text); border-bottom-color: var(--burnt); }
+.tab-icon {
+  width: 18px; height: 18px;
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px;
+  font-weight: 900;
+  flex-shrink: 0;
+}
+.tab-icon.ana { background: var(--hnge-lt); color: var(--hnge); }
+.tab-icon.mod { background: var(--omda-lt); color: var(--omda); }
+.tab-badge {
+  font-size: 9px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 10px;
+  background: var(--omda-lt);
+  color: var(--omda);
+  letter-spacing: .06em;
+}
+
+/* ── TAB PANELS ───────────────────────────────── */
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ── SECTION SCAFFOLD ─────────────────────────── */
+.section-wrap { padding: 0 60px; margin-top: 52px; }
+.section-label {
+  font-size: 8.5px; font-weight: 800; letter-spacing: .24em; text-transform: uppercase;
+  color: var(--muted); display: flex; align-items: center; gap: 12px; margin-bottom: 22px;
+}
+.section-label::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+.section-num { color: var(--coral); font-size: 10px; font-weight: 900; }
+
+/* ── COMPANY HEADER BADGES ────────────────────── */
+.co-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+.co-badge { display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-radius: 8px; }
+.co-badge.hnge { background: var(--hnge-lt); border: 1.5px solid rgba(0,61,72,.16); }
+.co-badge.omda { background: var(--omda-lt); border: 1.5px solid rgba(196,79,35,.16); }
+.co-ticker { font-size: 26px; font-weight: 900; letter-spacing: -.5px; }
+.co-ticker.hnge { color: var(--hnge); }
+.co-ticker.omda { color: var(--omda); }
+.co-info { display: flex; flex-direction: column; gap: 2px; }
+.co-name { font-size: 11px; font-weight: 700; }
+.co-desc { font-size: 9px; font-weight: 500; color: var(--muted); }
+
+/* ── KPI STRIP ────────────────────────────────── */
+.kpi-strip {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 32px;
+}
+.kpi-half {
+  display: grid; grid-template-columns: 1fr 1fr;
+  background: var(--panel); border: 1.5px solid var(--line); border-radius: 10px;
+  overflow: hidden;
+}
+.kpi-cell { padding: 22px 20px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.kpi-cell:nth-child(2n) { border-right: none; }
+.kpi-cell:nth-last-child(-n+2) { border-bottom: none; }
+.kpi-lbl { font-size: 8px; font-weight: 700; letter-spacing: .12em; color: var(--muted); text-transform: uppercase; margin-bottom: 7px; }
+.kpi-val { font-size: 24px; font-weight: 800; line-height: 1; }
+.kpi-sub { font-size: 9.5px; font-weight: 500; color: var(--muted); margin-top: 5px; }
+
+/* ── REVENUE BARS ─────────────────────────────── */
+.rev-grid { background: var(--panel); border: 1.5px solid var(--line); border-radius: 10px; padding: 28px; margin-bottom: 30px; }
+.rev-yr-lbl { font-size: 9px; font-weight: 700; letter-spacing: .1em; color: var(--muted); text-transform: uppercase; margin-bottom: 5px; }
+.rev-bars { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
+.rev-bar-row { display: flex; align-items: center; gap: 10px; }
+.rev-co { width: 38px; font-size: 7.5px; font-weight: 800; letter-spacing: .1em; flex-shrink: 0; text-transform: uppercase; }
+.rev-track { flex: 1; height: 22px; background: var(--panel2); border-radius: 3px; overflow: hidden; }
+.rev-fill { height: 100%; border-radius: 3px; display: flex; align-items: center; padding: 0 9px; font-size: 8.5px; font-weight: 700; white-space: nowrap; color: #fff; min-width: 4px; }
+.rev-fill.h { background: var(--hnge); }
+.rev-fill.o { background: var(--omda); }
+.rev-fill.g { background: var(--coral); opacity: .65; }
+.rev-growth { width: 52px; text-align: right; font-size: 9px; font-weight: 700; flex-shrink: 0; }
+.rev-sep { height: 1px; background: var(--line); margin: 10px 0; }
+
+/* ── DATA TABLE ───────────────────────────────── */
+.dt { width: 100%; border-collapse: collapse; }
+.dt th {
+  text-align: right; padding: 9px 12px; font-size: 7.5px; font-weight: 800;
+  letter-spacing: .14em; color: #fff; background: var(--teal);
+}
+.dt th:first-child { text-align: left; }
+.dt td { padding: 9px 12px; text-align: right; font-size: 11.5px; font-weight: 500; border-bottom: 1px solid rgba(0,61,72,.06); }
+.dt td:first-child { text-align: left; color: var(--muted); font-size: 11px; font-weight: 600; padding-left: 16px; }
+.dt .s-row td { background: var(--panel2); font-size: 7.5px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; padding: 7px 12px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.dt .s-row td:first-child { padding-left: 16px; }
+.dt tr:hover td { background: rgba(0,61,72,.02); }
+.dt .ha td:first-child { border-left: 2.5px solid var(--hnge); }
+.dt .oa td:first-child { border-left: 2.5px solid var(--omda); }
+.pos   { color: var(--pos)  !important; }
+.neg   { color: var(--neg)  !important; }
+.dim   { color: var(--muted)!important; }
+.gld   { color: var(--gold) !important; }
+.na    { color: var(--na)   !important; font-style: italic; }
+.b     { font-weight: 800   !important; }
+
+/* ── MARGIN BARS ──────────────────────────────── */
+.margin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 30px; }
+.margin-card { background: var(--panel); border: 1.5px solid var(--line); border-radius: 10px; padding: 24px; }
+.margin-card-title { font-size: 8.5px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; margin-bottom: 18px; }
+.m-row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+.m-yr { font-size: 9.5px; font-weight: 700; color: var(--muted); width: 36px; flex-shrink: 0; }
+.m-track { flex: 1; height: 18px; background: var(--panel2); border-radius: 2px; overflow: hidden; }
+.m-fill { height: 100%; border-radius: 2px; display: flex; align-items: center; padding: 0 7px; font-size: 8.5px; font-weight: 700; white-space: nowrap; }
+.m-fill.h { background: var(--hnge); color: #fff; }
+.m-fill.o { background: var(--omda); color: #fff; }
+.m-fill.lo { background: rgba(196,79,35,.2); color: var(--omda); }
+
+/* ── FCF BARS ─────────────────────────────────── */
+.fcf-bar { height: 18px; border-radius: 2px; display: flex; align-items: center; padding: 0 8px; font-size: 8.5px; font-weight: 700; white-space: nowrap; min-width: 4px; }
+.fcf-bar.hp { background: var(--hnge); color: #fff; }
+.fcf-bar.hn { background: rgba(196,79,35,.1); border: 1.5px solid rgba(196,79,35,.28); color: var(--neg); }
+.fcf-bar.op { background: var(--omda); color: #fff; }
+.fcf-bar.on { background: rgba(196,79,35,.07); border: 1.5px solid rgba(196,79,35,.2); color: var(--neg); }
+
+/* ── INCR MARGIN ──────────────────────────────── */
+.incr-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 30px; }
+.incr-card { background: var(--panel); border: 1.5px solid var(--line); border-radius: 10px; padding: 28px 28px 24px; }
+.incr-cents { font-size: 72px; font-weight: 900; line-height: 1; letter-spacing: -2px; }
+.incr-label { font-size: 9px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; margin-top: 6px; }
+.incr-math { font-size: 9.5px; font-weight: 500; color: var(--muted); margin-top: 10px; line-height: 1.7; }
+.incr-sep { height: 1px; background: var(--line); margin: 12px 0; }
+
+/* ── RULE OF 40 ───────────────────────────────── */
+.ro40-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 24px; }
+.ro40-card { background: var(--panel); border: 1.5px solid var(--line); border-radius: 10px; padding: 24px; }
+.ro40-entry { display: flex; align-items: center; justify-content: space-between; padding: 11px 0; border-bottom: 1px solid var(--line); }
+.ro40-entry:last-child { border-bottom: none; }
+.ro40-left { display: flex; flex-direction: column; gap: 3px; }
+.ro40-yr { font-size: 11px; font-weight: 700; }
+.ro40-comp { font-size: 9px; font-weight: 500; color: var(--muted); }
+.ro40-score { font-size: 46px; font-weight: 900; line-height: 1; letter-spacing: -1px; }
+
+/* ── EV SECTION ───────────────────────────────── */
+.ev-grid { background: var(--panel); border: 1.5px solid var(--line); border-radius: 10px; overflow: hidden; margin-bottom: 14px; }
+.ev-hdr { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid var(--line); }
+.ev-co { padding: 18px 24px; }
+.ev-co:first-child { border-right: 1px solid var(--line); }
+.ev-ticker { font-size: 22px; font-weight: 900; letter-spacing: -.5px; }
+.ev-ev { font-size: 17px; font-weight: 700; margin-top: 2px; }
+.ev-meta { font-size: 9px; font-weight: 500; color: var(--muted); margin-top: 4px; }
+
+/* ── DOUBLE PANEL ─────────────────────────────── */
+.double-panel { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 30px; }
+.dpanel { background: var(--panel); border: 1.5px solid var(--line); border-radius: 10px; padding: 20px 22px; }
+.dpanel.ht { border-top: 3px solid var(--hnge); }
+.dpanel.ot { border-top: 3px solid var(--omda); }
+.dpanel-title { font-size: 8.5px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; margin-bottom: 10px; }
+.dpanel-body { font-size: 10px; font-weight: 500; color: var(--muted); line-height: 1.75; }
+
+/* ── FOOTNOTES ────────────────────────────────── */
+.fn {
+  margin: 0 60px; padding: 18px 22px;
+  background: var(--panel); border: 1.5px solid var(--line); border-radius: 8px;
+  font-size: 10.5px; font-weight: 500; color: var(--muted); line-height: 1.85;
+}
+.fn strong { color: var(--text); font-weight: 700; }
+
+/* ── MODELER STYLES ───────────────────────────── */
+.mod-wrap { padding: 0 60px 60px; margin-top: 40px; }
+.mod-intro { margin-bottom: 28px; }
+.mod-intro h2 { font-size: 18px; font-weight: 800; color: var(--text); margin-bottom: 6px; }
+.mod-intro p { font-size: 11px; font-weight: 500; color: var(--muted); line-height: 1.75; }
+
+.ip-section { background: var(--panel); border: 1.5px solid var(--line); border-radius: 10px; padding: 28px; margin-bottom: 24px; }
+.ip-section-label { font-size: 8.5px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); margin-bottom: 20px; }
+.ip-years { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 0 40px; }
+.ip-yr-head { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--omda); margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1.5px solid var(--omda-lt); }
+
+.sl-row { margin-bottom: 12px; }
+.sl-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+.sl-lbl { font-size: 10px; font-weight: 700; color: var(--muted); }
+.sl-val { font-size: 11px; font-weight: 700; color: var(--text); min-width: 48px; text-align: right; }
+input[type=range] { width: 100%; height: 3px; cursor: pointer; accent-color: var(--omda); }
+
+.sl-ref { font-size: 10px; font-weight: 500; margin-top: 2px; min-height: 14px; color: var(--muted); }
+.sl-fcf-lbl { font-size: 10px; font-weight: 700; color: var(--muted); }
+.sl-fcf-val { font-size: 11px; font-weight: 700; min-width: 48px; text-align: right; color: var(--text); }
+
+.scenarios-grid { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1.05fr) minmax(0,1fr); gap: 12px; margin-bottom: 24px; }
+.s-card { background: var(--panel); border: 1.5px solid var(--line); border-radius: 10px; overflow: hidden; }
+.s-card.center-card { border: 2px solid var(--omda); }
+.s-card-hdr { padding: 12px 16px 10px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 10px; }
+.s-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.s-name { font-size: 13px; font-weight: 800; color: var(--text); }
+.s-tag { font-size: 9px; font-weight: 700; padding: 2px 8px; border-radius: 10px; margin-left: auto; }
+.s-body { padding: 12px 16px 14px; }
+.s-yr-block { margin-bottom: 10px; }
+.s-yr-block:last-child { margin-bottom: 0; }
+.s-yr-lbl { font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+.s-metrics { display: flex; flex-direction: column; gap: 5px; }
+.s-metric-row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; border-bottom: 0.5px solid var(--line); padding-bottom: 5px; }
+.s-metric-row:last-child { border-bottom: none; padding-bottom: 0; }
+.s-metric-lbl { font-size: 10px; font-weight: 500; color: var(--muted); white-space: nowrap; }
+.s-metric-val { font-size: 11px; font-weight: 600; color: var(--text); text-align: right; }
+.s-divider { height: 1px; background: var(--line); margin: 16px 0 14px; }
+
+.mult-section-label { font-size: 8.5px; font-weight: 800; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; display: flex; align-items: center; gap: 12px; }
+.mult-section-label::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+
+.mt { width: 100%; border-collapse: collapse; }
+.mt th { text-align: right; padding: 8px 10px; font-size: 7.5px; font-weight: 800; letter-spacing: .12em; color: #fff; background: var(--teal); }
+.mt th:first-child { text-align: left; }
+.mt th.hnge-c { color: #fff !important; background: var(--hnge); border-left: 2px solid rgba(255,255,255,0.25); border-right: 2px solid rgba(255,255,255,0.25); }
+.mt th.mt-spacer { background: var(--panel2) !important; width: 8px; padding: 0 !important; }
+.mt td { padding: 7px 10px; text-align: right; font-size: 10px; font-weight: 500; border-bottom: 1px solid rgba(0,61,72,.06); color: var(--text); }
+.mt td:first-child { text-align: left; color: var(--muted); font-size: 9.5px; font-weight: 600; padding-left: 14px; }
+.mt tr:last-child td { border-bottom: none; }
+.mt .grp td { background: var(--panel2); font-size: 7.5px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); padding: 5px 10px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.mt .grp td:first-child { padding-left: 14px; }
+.hnge-c { color: var(--hnge) !important; font-weight: 700 !important; }
+.mt th.hnge-c { color: #fff !important; }
+.mt .pos { color: var(--pos) !important; }
+.mt .neg { color: var(--neg) !important; }
+.mt .dim { color: var(--muted) !important; }
+.mt .na  { color: var(--na)   !important; font-style: italic; }
+.mt .b   { font-weight: 800   !important; }
+.mt-spacer { background: var(--panel2) !important; width: 8px; padding: 0 !important; }
+
+.mod-foot { font-size: 9.5px; font-weight: 500; color: var(--muted); line-height: 1.8; margin-top: 16px; background: var(--panel); border: 1.5px solid var(--line); border-radius: 8px; padding: 16px 20px; }
+.mod-foot strong { color: var(--text); font-weight: 700; }
+/* ── MEMO STYLES ──────────────────────────────── */
+.memo-section { margin-bottom: 48px; }
+.memo-h1 {
+  font-size: 13px; font-weight: 800; color: var(--text);
+  letter-spacing: .06em; text-transform: uppercase;
+  padding-bottom: 10px; margin-bottom: 18px;
+  border-bottom: 2px solid var(--teal);
+  margin-top: 0;
+}
+.memo-h2 { font-size: 12px; font-weight: 800; color: var(--text); margin: 22px 0 10px; }
+.memo-h3 { font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 14px 0 6px; }
+.memo-body { font-size: 12px; font-weight: 500; color: var(--muted); line-height: 1.9; margin-bottom: 10px; }
+.memo-bold { font-weight: 700; color: var(--text); }
+.memo-bullet {
+  font-size: 12px; font-weight: 500; color: var(--muted); line-height: 1.85;
+  padding-left: 18px; position: relative; margin-bottom: 9px;
+}
+.memo-bullet::before { content: '·'; position: absolute; left: 4px; color: var(--coral); font-weight: 900; }
+.memo-fn { font-size: 10.5px; font-weight: 500; color: var(--muted2); line-height: 1.75; margin-bottom: 5px; font-style: italic; }
+
+.memo-tbl { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+.memo-tbl th {
+  text-align: right; padding: 8px 11px; font-size: 8px; font-weight: 800;
+  letter-spacing: .14em; color: #fff; background: var(--teal);
+}
+.memo-tbl th:first-child { text-align: left; }
+.memo-tbl td { padding: 8px 11px; text-align: right; font-size: 11.5px; font-weight: 500; border-bottom: 1px solid rgba(0,61,72,.06); color: var(--text); }
+.memo-tbl td:first-child { text-align: left; }
+.memo-tbl .alt td { background: var(--panel2); }
+.memo-tbl-lbl { color: var(--muted) !important; font-size: 10.5px !important; font-weight: 600 !important; padding-left: 14px !important; }
+.memo-tbl-note { text-align: left !important; color: var(--muted) !important; font-size: 10px !important; font-style: italic; }
+.memo-tbl-sec td { background: var(--panel2) !important; font-size: 8.5px !important; font-weight: 800 !important; letter-spacing: .16em; text-transform: uppercase; padding: 6px 11px !important; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); color: var(--muted) !important; }
+.hnge-sec td { color: var(--hnge) !important; border-left: 3px solid var(--hnge); }
+.omda-sec td { color: var(--omda) !important; border-left: 3px solid var(--omda); }
+.memo-tbl-q th, .memo-tbl-q td { padding: 7px 8px; font-size: 10px; }
+</style>
+</head>
+<body>
+
+<!-- ══════════ MASTHEAD (shared) ══════════ -->
+<div class="masthead">
+  <div class="masthead-inner">
+    <div class="eyebrow">Omada Health Internal Use &nbsp;·&nbsp; Digital Health Financial Benchmarking &nbsp;·&nbsp; March 2026</div>
+    <div class="title-row">
+      <div class="company-pill">
+        <div class="ticker omda">OMDA</div>
+        <div class="company-name">Omada Health, Inc.</div>
+      </div>
+      <div class="vs-block"><div class="vs-text">vs</div></div>
+      <div class="company-pill">
+        <div class="ticker hnge">HNGE</div>
+        <div class="company-name">Hinge Health, Inc.</div>
+      </div>
+    </div>
+    <div class="masthead-meta">
+      <div class="meta-item"><div class="meta-label">Exchange</div><div class="meta-val" style="color:var(--omda)">NASDAQ: OMDA</div></div>
+      <div class="meta-item"><div class="meta-label">Exchange</div><div class="meta-val" style="color:var(--hnge)">NYSE: HNGE</div></div>
+      <div class="meta-item"><div class="meta-label">IPO Date</div><div class="meta-val">June 2025 (both)</div></div>
+      <div class="meta-item"><div class="meta-label">OMDA Focus</div><div class="meta-val" style="color:var(--omda)">Cardiometabolic + MSK</div></div>
+      <div class="meta-item"><div class="meta-label">HNGE Focus</div><div class="meta-val" style="color:var(--hnge)">Digital MSK</div></div>
+      <div class="meta-item"><div class="meta-label">Prices (late Mar 2026)</div><div class="meta-val">OMDA ~$13.50 &nbsp;·&nbsp; HNGE ~$41</div></div>
+      <div class="meta-item"><div class="meta-label">Sources</div><div class="meta-val">Audited SEC filings · Q4 2025 Earnings</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ TAB BAR ══════════ -->
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('memo', this)">
+    <span class="tab-icon" style="background:var(--hnge-lt);color:var(--hnge)">M</span>
+    Executive Memo
+  </button>
+  <button class="tab-btn" onclick="switchTab('analysis', this)">
+    <span class="tab-icon ana">A</span>
+    Historical Analysis
+  </button>
+  <button class="tab-btn" onclick="switchTab('modeler', this)">
+    <span class="tab-icon mod">I</span>
+    Multiple Expansion Modeler
+    <span class="tab-badge">Interactive</span>
+  </button>
+</div>
+
+
+<!-- ══════════════════════════════════════════════
+     TAB 0 — EXECUTIVE MEMO
+══════════════════════════════════════════════ -->
+<div id="tab-memo" class="tab-panel active">
+<div style="padding:0 60px 80px;margin-top:0;">
+
+  <!-- MEMO HEADER -->
+  <div style="padding:48px 0 32px;border-bottom:2.5px solid var(--teal);margin-bottom:40px;">
+    <div style="font-size:9px;font-weight:700;letter-spacing:.28em;color:var(--muted);text-transform:uppercase;margin-bottom:14px;">Memorandum &nbsp;·&nbsp; Confidential — Internal Use Only</div>
+    <div style="font-size:38px;font-weight:900;color:var(--text);line-height:1.1;letter-spacing:-1px;margin-bottom:10px;">Omada Health (OMDA) vs. Hinge Health (HNGE)</div>
+    <div style="font-size:14px;font-weight:500;color:var(--muted);margin-bottom:32px;">Extended Historical Financial Comparison, Valuation &amp; Multiple Expansion Analysis</div>
+    <div style="display:grid;grid-template-columns:auto 1fr;gap:6px 24px;max-width:680px;">
+      <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;padding-top:1px;">To</div><div style="font-size:11px;font-weight:500;color:var(--text);">Senior Leadership / Investment Committee</div>
+      <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;padding-top:1px;">From</div><div style="font-size:11px;font-weight:500;color:var(--text);">Strategy &amp; Corporate Development</div>
+      <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;padding-top:1px;">Date</div><div style="font-size:11px;font-weight:500;color:var(--text);">March 29, 2026</div>
+      <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;padding-top:1px;">Re</div><div style="font-size:11px;font-weight:500;color:var(--text);">OMDA vs. HNGE: Verified Financials, EV Multiples, Rule of 40, Incremental Margin &amp; Multiple Expansion Framework</div>
+      <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;padding-top:1px;">Prices</div><div style="font-size:11px;font-weight:500;color:var(--text);">OMDA ~$13–14/sh (NASDAQ, late March 2026) &nbsp;·&nbsp; HNGE ~$41–42/sh (NYSE, late March 2026)</div>
+      <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;padding-top:1px;">Sources</div><div style="font-size:11px;font-weight:500;color:var(--text);">HNGE: SEC Filing Feb 10, 2026 (Exhibit 99.1). OMDA: Earnings Release Mar 5, 2026. S-1/424B4 prospectuses for historical periods. All figures audited unless noted.</div>
+    </div>
+  </div>
+
+  <!-- SECTION STYLES reused: memo-h1, memo-h2, memo-body, memo-bullet -->
+
+  <!-- I. EXECUTIVE SUMMARY -->
+  <div class="memo-section">
+    <div class="memo-h1">I. Executive Summary</div>
+    <p class="memo-body">This memo is prepared for Omada Health's internal use as both a financial benchmarking exercise and a strategic planning input. Hinge Health has emerged as the defining public comp for digital health platforms serving employer and health plan populations — the company most investors and analysts reach for when sizing Omada's valuation potential. Understanding precisely where Omada sits relative to that benchmark, on every relevant financial dimension, is a prerequisite for credible internal planning and for shaping the investor narrative going forward.</p>
+    <p class="memo-body">The benchmarking objective is quantitative and primary-source-grounded: where does Omada's revenue, margin, cash flow, and operating efficiency stand today relative to Hinge Health, and how has each trajectory evolved across all reported periods? The strategic planning objective is forward-looking: which specific financial and operational levers — hardware margin structure, incremental profit conversion, FCF generation — most directly influence Omada's path to multiple expansion, and what does the realistic timeline look like based on current guidance? This memo answers both questions with audited figures throughout.</p>
+    <p class="memo-body">Valuation note: EV calculations use late-March 2026 market prices — HNGE ~$41–42/sh and OMDA ~$13–14/sh. All multiples reflect the current trading environment.</p>
+
+    <div class="memo-h2">Summary of Key Findings</div>
+    <div class="memo-bullet"><span class="memo-bold">Revenue Scale &amp; Acceleration — Both Companies:</span> HNGE generated $587.9M in FY2025 revenue (+51% YoY), 2.3× OMDA's $260.2M (+53%). Both companies achieved their strongest reported growth rates in FY2025. At guided trajectories, the absolute revenue gap widens from ~$328M today to ~$420M by end of FY2026 — the relative scale gap holds constant at approximately 2.3×.</div>
+    <div class="memo-bullet"><span class="memo-bold">The EV Multiple Gap is Justified — and Not Simply a Revenue Story:</span> At current prices, HNGE trades at ~3.9× forward EV/Revenue vs. OMDA's ~1.8×. The key insight is that on profitability-anchored multiples the gap is far more extreme: HNGE at ~16.0× trailing EV/FCF vs. OMDA at ~46×. Counterintuitively, OMDA is more expensive than HNGE on a cash-flow basis despite the lower revenue multiple — because each dollar of OMDA's revenue converts to far less cash.</div>
+    <div class="memo-bullet"><span class="memo-bold">Incremental Margin Quality — A Real Gap, But Not 10×:</span> HNGE retained approximately 73 cents of every incremental revenue dollar as Non-GAAP operating income in FY2025. Using the same swing methodology for OMDA — Adj. EBITDA moved from $(29.4M) in FY2024 to +$6.5M in FY2025, a $35.9M swing on $90.4M of revenue growth — yields approximately 40 cents per incremental revenue dollar. The gap is real (~1.8×) but bridgeable. The absolute profit gap — $119.5M vs. $6.5M — places OMDA approximately 3–4 years behind HNGE's current profitability scale.</div>
+    <div class="memo-bullet"><span class="memo-bold">Gross Margin Structure — A Structural Limitation to Gross Margin Expansion:</span> OMDA's services-only GAAP gross margin of 78.5% is already competitive with HNGE's 80%, demonstrating parity on the core care delivery model. The blended figure of 65.7% reflects a deliberate model choice — connected devices are clinically essential to OMDA's cardiometabolic and GLP-1 programs. The resulting 14.3-point gap versus HNGE is a known architectural feature of the current business model, and is expected to persist as long as device-dependent programs remain a primary growth driver.</div>
+    <div class="memo-bullet"><span class="memo-bold">Rule of 40 — OMDA Likely Exits Elite Tier in FY2026:</span> HNGE scored 81 on the Rule of 40 in FY2025 (company self-reported). OMDA scored 58, crossing the 40 threshold for the first time. However, at FY2026 guided growth rates (~22%) with limited FCF expansion, OMDA's Rule of 40 is estimated to fall to approximately 27 — re-entering the Growth Investment Phase below the elite threshold.</div>
+    <div class="memo-bullet" style="margin-bottom:0"><span class="memo-bold">No Driver Closes Within the FY2026 Guidance Window:</span> A systematic review of seven root drivers — operating margin, FCF margin, gross margin, revenue scale, incremental margin quality, Rule of 40, and GLP-1 concentration risk — shows that zero of these gaps close meaningfully within the next twelve months based on published guidance.</div>
+  </div>
+
+  <!-- II. COMPANY OVERVIEWS -->
+  <div class="memo-section">
+    <div class="memo-h1">II. Company Overviews</div>
+
+    <div class="memo-h2" style="color:var(--omda)">Omada Health, Inc. (NASDAQ: OMDA)</div>
+    <p class="memo-body">Omada Health is a virtual "Between-Visit Care" platform addressing cardiometabolic conditions — diabetes prevention, diabetes, hypertension, weight management — plus musculoskeletal care. OMDA's model is distinctly human-led: Care Teams of health coaches, clinical specialists, and licensed PTs deliver personalized care, augmented by AI and connected devices. Revenue is tied to member enrollment milestones and outcomes-based billing.</p>
+    <p class="memo-body">OMDA's business model carries two structural gross margin characteristics that differ from HNGE's. First, human care team labor — health coaches, clinical specialists, and licensed PTs — scales roughly with member volume, creating a cost structure that limits the pace of services margin expansion. Second, connected devices (scales, blood pressure monitors, CGMs) are clinically integral to OMDA's cardiometabolic and GLP-1 programs; in FY2025 the device segment generated $19.2M of revenue against $37.4M of COR, a net cost that pulls the blended GAAP margin below the services-only rate of 78.5%.</p>
+    <p class="memo-body">Omada is the clear enterprise leader in GLP-1 companion care, having scaled from 50,000 to 150,000 GLP-1-enrolled members during 2025. IPO proceeds: ~$161M net (June 2025). Balance sheet: $222.0M cash, zero debt (MidCap facility fully repaid). FY2025 was the first year of both FCF and Adj. EBITDA profitability for OMDA in its history.</p>
+
+    <div class="memo-h2" style="color:var(--hnge)">Hinge Health, Inc. (NYSE: HNGE)</div>
+    <p class="memo-body">Hinge Health is a digital musculoskeletal (MSK) care platform delivering AI-powered exercise therapy, an FDA-cleared wearable device (Enso), and virtual care teams to self-insured employers and health plans. The company bills on a per-member-per-year subscription basis embedded within clients' medical spend, providing billing stickiness that is meaningfully different from discretionary benefit budgets.</p>
+    <p class="memo-body">Critically, HNGE's platform is purely software-delivered — no ongoing hardware dependency at scale — enabling a GAAP gross margin of 80% in FY2025 (83% on a non-GAAP basis). The company's AI-powered TrueMotion technology has reduced human physical therapist hours per member by approximately 95% versus traditional in-person PT. As of December 31, 2025, Hinge served 2,830 clients, had approximately 25 million contracted lives, 782,890 active members, a 97% client retention rate, and NDR of 116%.</p>
+    <p class="memo-body">IPO proceeds: ~$256M net (June 2025). Balance sheet: $478.8M cash and marketable securities, zero debt. The company authorized a $250M share repurchase program in November 2025 and executed $65M of buybacks in Q4 2025 — made possible by $179.6M of FY2025 FCF.</p>
+  </div>
+
+  <!-- III. ANNUAL FINANCIALS -->
+  <div class="memo-section">
+    <div class="memo-h1">III. Verified Financial Baseline — Annual Financials (FY2022–FY2025)</div>
+    <p class="memo-body">All figures in this section are sourced from audited primary filings. HNGE FY2025 data is from the February 10, 2026 SEC filing (Exhibit 99.1). OMDA FY2025 data is from the March 5, 2026 audited earnings press release, cross-referenced with the 10-K filed concurrently. Historical data (FY2022–FY2024) is from each company's S-1/424B4 final prospectus. Where a figure sourced from two documents differs, the more recent audited filing governs.</p>
+
+    <table class="memo-tbl">
+      <thead><tr>
+        <th style="text-align:left">Metric ($M)</th><th>FY 2022</th><th>FY 2023</th><th>FY 2024</th><th>FY 2025</th><th>2026E</th><th style="text-align:left">Notes</th>
+      </tr></thead>
+      <tbody>
+        <tr class="memo-tbl-sec omda-sec"><td colspan="7">OMDA — Omada Health</td></tr>
+        <tr><td class="memo-tbl-lbl">Revenue</td><td class="dim">$89.2</td><td>$122.8</td><td>$169.8</td><td class="pos">$260.2</td><td class="gld">$317M¹</td><td class="memo-tbl-note"></td></tr>
+        <tr class="alt"><td class="memo-tbl-lbl">YoY Growth</td><td class="na">—</td><td class="pos">+38%</td><td class="pos">+38%</td><td class="pos">+53%</td><td class="gld">~+22%</td><td class="memo-tbl-note"></td></tr>
+        <tr><td class="memo-tbl-lbl">Gross Profit</td><td class="dim">$42.8</td><td>$70.0</td><td>$102.9</td><td class="pos">$170.9</td><td class="na">—</td><td class="memo-tbl-note"></td></tr>
+        <tr class="alt"><td class="memo-tbl-lbl">GAAP Gross Margin</td><td class="neg">48%</td><td>57%</td><td>60.6%</td><td class="pos b">65.7%</td><td class="na">—</td><td class="memo-tbl-note">48%→65.7% · +1,770 bps</td></tr>
+        <tr><td class="memo-tbl-lbl">Hardware Rev. / Gross Loss</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="neg b">$(18.2M)</td><td class="na">—</td><td class="memo-tbl-note">$19.2M rev · $37.4M COR</td></tr>
+        <tr class="alt"><td class="memo-tbl-lbl">Adj. EBITDA</td><td class="na">—</td><td class="na">—</td><td class="neg">$(29.4)</td><td class="pos">$6.5</td><td class="gld">$7–15M¹</td><td class="memo-tbl-note">First positive FY25</td></tr>
+        <tr><td class="memo-tbl-lbl">GAAP Net Loss</td><td class="neg">$(72.5)</td><td class="neg">$(67.5)</td><td class="neg">$(47.1)</td><td class="neg">$(12.8)</td><td class="na">—</td><td class="memo-tbl-note">Q4'25 first GAAP profit</td></tr>
+        <tr class="alt"><td class="memo-tbl-lbl">Free Cash Flow</td><td class="na">—</td><td class="neg">$(49.7)</td><td class="neg">$(38.0)</td><td class="pos">$12.4</td><td class="na">—</td><td class="memo-tbl-note">First FCF+ in FY25</td></tr>
+        <tr><td class="memo-tbl-lbl">FCF Margin</td><td class="na">—</td><td class="neg">(40%)</td><td class="neg">(22%)</td><td class="pos">+4.8%</td><td class="na">—</td><td class="memo-tbl-note"></td></tr>
+        <tr class="alt"><td class="memo-tbl-lbl">Incr. Margin (¢/$rev)</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="neg b">~40¢</td><td class="na">—</td><td class="memo-tbl-note">ΔAdj.EBITDA / ΔRev. (swing)</td></tr>
+        <tr class="memo-tbl-sec hnge-sec"><td colspan="7">HNGE — Hinge Health</td></tr>
+        <tr><td class="memo-tbl-lbl">Revenue</td><td class="dim">$194.4</td><td>$292.7</td><td>$390.4</td><td class="pos">$587.9</td><td class="gld">$737M¹</td><td class="memo-tbl-note"></td></tr>
+        <tr class="alt"><td class="memo-tbl-lbl">YoY Growth</td><td class="dim">+31%</td><td class="pos">+51%</td><td class="dim">+33%</td><td class="pos">+51%</td><td class="gld">~+25%</td><td class="memo-tbl-note"></td></tr>
+        <tr><td class="memo-tbl-lbl">Gross Profit</td><td class="dim">$89.7</td><td>$194.2</td><td>$299.9</td><td class="pos">$468.2</td><td class="na">—</td><td class="memo-tbl-note"></td></tr>
+        <tr class="alt"><td class="memo-tbl-lbl">GAAP Gross Margin</td><td class="neg">46%</td><td>66%</td><td>77%</td><td class="pos b">80%</td><td class="na">—</td><td class="memo-tbl-note">46%→80% · +3,400 bps</td></tr>
+        <tr><td class="memo-tbl-lbl">Non-GAAP Op. Income</td><td class="na">—</td><td class="neg">$(56.4)</td><td class="neg">$(26.1)</td><td class="pos">$119.5</td><td class="gld">$153.5M¹</td><td class="memo-tbl-note">Primary non-GAAP metric</td></tr>
+        <tr class="alt"><td class="memo-tbl-lbl">Adj. EBITDA (est.)³</td><td class="na">—</td><td class="neg">$(50.5)</td><td class="neg">$(20.2)</td><td class="pos">$124.6</td><td class="na">—</td><td class="memo-tbl-note">Non-GAAP Op.I + D&amp;A</td></tr>
+        <tr><td class="memo-tbl-lbl">GAAP Net Inc (Loss)</td><td class="neg">$(218)</td><td class="neg">$(108.1)</td><td class="neg">$(11.9)</td><td class="neg">$(528)²</td><td class="na">—</td><td class="memo-tbl-note">FY25: $643M IPO SBC</td></tr>
+        <tr class="alt"><td class="memo-tbl-lbl">Free Cash Flow</td><td class="na">—</td><td class="neg">$(68.5)</td><td class="pos">$45.2</td><td class="pos">$179.6</td><td class="na">—</td><td class="memo-tbl-note">FCF+ from FY2024</td></tr>
+        <tr><td class="memo-tbl-lbl">FCF Margin</td><td class="na">—</td><td class="neg">(23%)</td><td class="pos">+12%</td><td class="pos">+31%</td><td class="na">—</td><td class="memo-tbl-note"></td></tr>
+        <tr class="alt"><td class="memo-tbl-lbl">Incr. Margin (¢/$rev)</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="pos b">~73¢</td><td class="na">—</td><td class="memo-tbl-note">Non-GAAP Op.I / ΔRev.</td></tr>
+      </tbody>
+    </table>
+
+    <p class="memo-fn">¹ Guidance midpoints: HNGE $732–742M revenue, $151–156M Non-GAAP operating income. OMDA $312–322M revenue, $7–15M Adj. EBITDA.</p>
+    <p class="memo-fn">² HNGE FY2025 GAAP net loss of $528M dominated by ~$643M SBC recognized at IPO (RSU/option vesting). Non-GAAP operating income of $119.5M is the operative performance measure.</p>
+    <p class="memo-fn">³ HNGE Adj. EBITDA estimated as Non-GAAP Operating Income + D&amp;A ($5.1M in FY2025). HNGE's primary disclosed non-GAAP measure is Non-GAAP Operating Income.</p>
+
+    <div class="memo-h2">Incremental Margin Analysis</div>
+    <p class="memo-body">The incremental operating margin — the percentage of each additional revenue dollar that flows through to operating profit — is one of the most powerful expressions of a platform's operating leverage. It is less susceptible to base effects than percentage margin changes and more directly reflects the unit economics of scaling.</p>
+    <p class="memo-body">For HNGE in FY2025: Non-GAAP operating income moved from $(26.1M) to +$119.5M — a swing of $145.6M. Revenue moved from $390.4M to $587.9M — an increase of $197.5M. Incremental Non-GAAP operating margin: $145.6M ÷ $197.5M = approximately <strong style="color:var(--pos)">73 cents per incremental revenue dollar</strong>.</p>
+    <p class="memo-body">For OMDA in FY2025: Adj. EBITDA moved from $(29.4M) in FY2024 to +$6.5M in FY2025 — a full swing of $35.9M on $90.4M of revenue growth — yielding approximately <strong style="color:var(--omda)">40 cents per incremental revenue dollar</strong>. OMDA is converting 40¢ of every new revenue dollar into profit — a credible starting point, but well below HNGE's 73¢. The more consequential difference is absolute scale: HNGE generated $119.5M of non-GAAP operating income vs. OMDA's $6.5M of Adj. EBITDA — placing OMDA approximately 3–4 years behind at current growth rates.</p>
+  </div>
+
+  <!-- IV. QUARTERLY DATA -->
+  <div class="memo-section">
+    <div class="memo-h1">IV. Quarterly Financial Data — FY2024 &amp; FY2025</div>
+    <p class="memo-body">The sequential OMDA Adj. EBITDA progression deserves particular attention: $(10.3M) → $(9.4M) → $(5.8M) → $(4.0M) → $(4.2M) → $(0.2M) → +$2.4M → +$8.5M — a clean, uninterrupted eight-quarter improvement with no reversals. Similarly, OMDA achieved GAAP net income in Q3 2025 (+$3.4M) and Q4 2025 (+$5.2M) — the first profitable quarters in company history.</p>
+
+    <table class="memo-tbl memo-tbl-q">
+      <thead><tr>
+        <th style="text-align:left">Metric ($M)</th>
+        <th>Q1'24</th><th>Q2'24</th><th>Q3'24</th><th>Q4'24</th>
+        <th>Q1'25</th><th>Q2'25</th><th>Q3'25</th><th>Q4'25</th>
+        <th style="text-align:center">Trend</th>
+      </tr></thead>
+      <tbody>
+        <tr class="memo-tbl-sec omda-sec"><td colspan="10">OMDA — Omada Health</td></tr>
+        <tr><td class="memo-tbl-lbl">Revenue</td><td>$35.1</td><td>$41.2</td><td>$45.6</td><td>$48.0</td><td>$55.0</td><td>$61.4</td><td>$68.4</td><td class="pos">$75.8</td><td class="pos b" style="text-align:center">↑↑</td></tr>
+        <tr class="alt"><td class="memo-tbl-lbl">YoY Growth</td><td class="pos">+57%</td><td class="dim">+40%</td><td class="dim">+35%</td><td class="dim">+29%</td><td class="pos">+57%</td><td class="pos">+49%</td><td class="pos">+50%</td><td class="pos">+58%</td><td class="pos b" style="text-align:center">↑</td></tr>
+        <tr><td class="memo-tbl-lbl">GAAP Gross Margin</td><td class="neg">49%</td><td>60%</td><td>63%</td><td>67%</td><td class="neg">58%</td><td>66%</td><td>66%</td><td class="pos">71%</td><td class="pos b" style="text-align:center">↑</td></tr>
+        <tr class="alt"><td class="memo-tbl-lbl">Adj. EBITDA</td><td class="neg">$(10.3)</td><td class="neg">$(9.4)</td><td class="neg">$(5.8)</td><td class="neg">$(4.0)</td><td class="neg">$(4.2)</td><td class="neg">$(0.2)</td><td class="pos">$2.4</td><td class="pos">$8.5</td><td class="pos b" style="text-align:center">↑</td></tr>
+        <tr><td class="memo-tbl-lbl">GAAP Net Inc (Loss)</td><td class="neg">$(19.0)</td><td class="neg">$(10.7)</td><td class="neg">$(9.1)</td><td class="neg">$(8.3)</td><td class="neg">$(9.4)</td><td class="neg">$(5.1)</td><td class="pos">$3.4</td><td class="pos">$5.2</td><td class="pos b" style="text-align:center">↑</td></tr>
+        <tr class="alt"><td class="memo-tbl-lbl">Free Cash Flow</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="neg">$(7.5)</td><td class="neg">$(16.1)</td><td class="neg">$(6.0)</td><td class="pos">$13.9</td><td class="pos">$20.0</td><td class="pos b" style="text-align:center">↑</td></tr>
+        <tr class="memo-tbl-sec hnge-sec"><td colspan="10">HNGE — Hinge Health</td></tr>
+        <tr><td class="memo-tbl-lbl">Revenue</td><td>$82.7</td><td>$89.8</td><td>$100.6</td><td>$117.3</td><td>$123.8</td><td>$139.1</td><td>$154.2</td><td class="pos">$170.7</td><td class="pos b" style="text-align:center">↑↑</td></tr>
+        <tr class="alt"><td class="memo-tbl-lbl">YoY Growth</td><td class="dim">+44%</td><td class="dim">+36%</td><td class="dim">+30%</td><td class="dim">+28%</td><td class="pos">+50%</td><td class="pos">+55%</td><td class="pos">+53%</td><td class="pos">+46%</td><td class="pos b" style="text-align:center">↑</td></tr>
+        <tr><td class="memo-tbl-lbl">GAAP Gross Margin</td><td>75%</td><td>75%</td><td>77%</td><td>82%</td><td>81%</td><td>79%</td><td>82%</td><td class="pos">84%</td><td class="pos b" style="text-align:center">↑</td></tr>
+        <tr class="alt"><td class="memo-tbl-lbl">Non-GAAP Op. Inc</td><td class="neg">$(12.3)</td><td class="neg">$(8.6)</td><td class="neg">$(6.7)</td><td class="pos">$21.4</td><td class="pos">$23.3</td><td class="pos">$27.0</td><td class="pos">$21.2</td><td class="pos">$48.0</td><td class="pos b" style="text-align:center">↑</td></tr>
+        <tr><td class="memo-tbl-lbl">Free Cash Flow</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="pos">$37.3</td><td class="pos">$12.7</td><td class="pos">$38.2</td><td class="pos">$67.2</td><td class="pos">$61.5</td><td class="pos b" style="text-align:center">↑</td></tr>
+      </tbody>
+    </table>
+
+    <div class="memo-h2">Key Quarterly Observations</div>
+    <div class="memo-h3" style="color:var(--omda)">OMDA</div>
+    <div class="memo-bullet"><span class="memo-bold">EBITDA inflection is sequential and uninterrupted:</span> Eight consecutive quarters of Adj. EBITDA improvement with no reversals is the most important single indicator that profitability improvement is structural. Q3 2025 (+$2.4M) was the first-ever positive quarter.</div>
+    <div class="memo-bullet"><span class="memo-bold">Q1 gross margin distortion:</span> OMDA's Q1 GAAP gross margin of 49% reflects annual member enrollment triggering hardware shipments in Q1 at near-zero gross margin. This seasonal pattern is structural to the model, not operational.</div>
+    <div class="memo-bullet"><span class="memo-bold">Revenue growth re-accelerating:</span> YoY growth decelerated from +57% in Q1 2024 to +26% in Q4 2024 before re-accelerating to +57–58% in Q1 and Q4 2025. The GLP-1 program ramp is a primary driver.</div>
+    <div class="memo-bullet"><span class="memo-bold">FCF positive for two consecutive quarters:</span> Q3 2025 (+$13.9M) and Q4 2025 (+$20.0M) were the first FCF-positive quarters in company history. Full-year FCF of +$12.4M is a genuine milestone, partly reflecting IPO-year working capital dynamics.</div>
+
+    <div class="memo-h3" style="color:var(--hnge)">HNGE</div>
+    <div class="memo-bullet"><span class="memo-bold">Non-GAAP profitability first achieved Q4 2024:</span> +$21.4M Non-GAAP operating income, maintained and expanded through all four quarters of FY2025. Q4 2025 Non-GAAP operating income of $48.0M represents 124% YoY growth.</div>
+    <div class="memo-bullet"><span class="memo-bold">GAAP gross margin stability:</span> HNGE's GAAP gross margin held in a tight 75–84% band across all eight quarters, confirming the durability of the software-driven cost structure. Q4 2025 at 84% is the highest in company history.</div>
+    <div class="memo-bullet"><span class="memo-bold">FCF re-acceleration:</span> Q3 2025 FCF of $67.2M and Q4 2025 FCF of $61.5M represent step-changes from the prior year's run-rates. Full-year FCF of $179.6M implies a ~31% FCF margin on ~$588M revenue.</div>
+    <div class="memo-bullet"><span class="memo-bold">Growth re-acceleration mid-year:</span> YoY revenue growth decelerated from +44% in Q1 2024 to +26% in Q4 2024 before re-accelerating sharply to +50–55% in H1 2025.</div>
+  </div>
+
+  <!-- V. VALUATION -->
+  <div class="memo-section">
+    <div class="memo-h1">V. Enterprise Value &amp; Trading Multiples — Late March 2026</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px;">
+      <div style="background:var(--omda-lt);border:1.5px solid rgba(196,79,35,.16);border-radius:10px;padding:20px 24px;">
+        <div style="font-size:22px;font-weight:900;color:var(--omda);margin-bottom:6px;">OMDA</div>
+        <div style="font-size:10px;font-weight:600;color:var(--muted);margin-bottom:10px;">~$13.50/sh · ~58.4M shares</div>
+        <div style="font-size:11px;font-weight:500;color:var(--text);line-height:1.9;">Market Cap: ~$789M<br>Net Cash: $222.0M<br><strong style="color:var(--omda)">Enterprise Value: ~$567M</strong></div>
+      </div>
+      <div style="background:var(--hnge-lt);border:1.5px solid rgba(0,61,72,.16);border-radius:10px;padding:20px 24px;">
+        <div style="font-size:22px;font-weight:900;color:var(--hnge);margin-bottom:6px;">HNGE</div>
+        <div style="font-size:10px;font-weight:600;color:var(--muted);margin-bottom:10px;">~$41/sh · ~82M shares</div>
+        <div style="font-size:11px;font-weight:500;color:var(--text);line-height:1.9;">Market Cap: ~$3.36B<br>Net Cash: $478.8M<br><strong style="color:var(--hnge)">Enterprise Value: ~$2.88B</strong></div>
+      </div>
+    </div>
+
+    <table class="memo-tbl">
+      <thead><tr>
+        <th style="text-align:left">Multiple</th><th>OMDA FY25</th><th>OMDA 2026E</th><th>HNGE FY24</th><th>HNGE FY25</th><th>HNGE 2026E</th>
+      </tr></thead>
+      <tbody>
+        <tr><td class="memo-tbl-lbl">EV / Revenue (Trailing)</td><td>2.2x</td><td class="gld">1.8x</td><td class="dim">7.4x</td><td>4.9x</td><td class="gld">3.9x</td></tr>
+        <tr class="alt"><td class="memo-tbl-lbl">EV / Gross Profit</td><td>3.3x</td><td class="gld">~2.5x</td><td class="dim">9.6x</td><td>6.2x</td><td class="gld">~4.9x</td></tr>
+        <tr><td class="memo-tbl-lbl">EV / Non-GAAP Op. Income</td><td class="na">N/M</td><td class="na">N/M</td><td class="na">N/M</td><td>24.1x</td><td class="gld">~19x</td></tr>
+        <tr class="alt"><td class="memo-tbl-lbl">EV / Adj. EBITDA</td><td class="neg b">~87x</td><td class="gld">~52x</td><td class="na">N/M</td><td>23.1x</td><td class="gld">~19x</td></tr>
+        <tr><td class="memo-tbl-lbl">EV / FCF</td><td class="neg b">46x</td><td class="gld">~35x</td><td class="dim">64x</td><td class="pos b">16.0x</td><td class="gld">~13x</td></tr>
+        <tr class="alt"><td class="memo-tbl-lbl">Revenue Growth</td><td class="pos">+53%</td><td class="gld">+22%</td><td class="dim">+33%</td><td class="pos">+51%</td><td class="gld">+25%</td></tr>
+        <tr><td class="memo-tbl-lbl">Rule of 40 (FCF-based)</td><td class="pos b">58</td><td class="neg b">~27E ⚠</td><td>45</td><td class="pos b">81</td><td class="gld">~47E</td></tr>
+        <tr class="alt"><td class="memo-tbl-lbl">Incr. Margin (¢/$rev)</td><td class="neg b">~40¢</td><td class="na">—</td><td class="na">—</td><td class="pos b">~74¢</td><td class="na">—</td></tr>
+      </tbody>
+    </table>
+
+    <div class="memo-h2">Valuation Observations</div>
+    <div class="memo-bullet"><span class="memo-bold">The forward revenue multiple gap (3.9× vs. 1.8×) understates the true divergence:</span> On EV/FCF — where institutional growth investors anchor intrinsic value — HNGE trades at ~16.0× while OMDA trades at ~46×. OMDA is more expensive than HNGE on a cash basis. OMDA's lower revenue multiple is not a sign of cheapness but a signal that the market is discounting each dollar of OMDA's revenue because its cash conversion is low.</div>
+    <div class="memo-bullet"><span class="memo-bold">OMDA's path to re-rating:</span> Multiple expansion requires the market to gain confidence in durable, scaled FCF generation — not just a first profitable quarter. Sustained full-year FCF margins in the 10–15%+ range would meaningfully compress EV/FCF and justify a re-rating. The earliest that trajectory becomes visible is 2027–2028 under current guidance.</div>
+
+    <div class="memo-h2">Capital Return Capacity as a Valuation Signal</div>
+    <p class="memo-body">HNGE's share repurchase program is among the most analytically informative data points in this comparison — not because buybacks directly move the multiple, but because of what the ability to execute one reveals about the underlying business.</p>
+
+    <div style="background:var(--hnge-lt);border:1.5px solid rgba(0,61,72,.14);border-radius:10px;padding:18px 24px;margin-bottom:16px;">
+      <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:rgba(0,61,72,.1);border-radius:6px;overflow:hidden;margin-bottom:14px;">
+        <div style="background:var(--panel);padding:12px 14px;">
+          <div style="font-size:8px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;">Authorization</div>
+          <div style="font-size:16px;font-weight:800;color:var(--hnge);">$250M</div>
+          <div style="font-size:9px;font-weight:500;color:var(--muted);margin-top:3px;">Nov 2025 · ~5 mos. post-IPO</div>
+        </div>
+        <div style="background:var(--panel);padding:12px 14px;">
+          <div style="font-size:8px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;">% of market cap</div>
+          <div style="font-size:16px;font-weight:800;color:var(--hnge);">7.2%</div>
+          <div style="font-size:9px;font-weight:500;color:var(--muted);margin-top:3px;">At ~$44/sh at announcement</div>
+        </div>
+        <div style="background:var(--panel);padding:12px 14px;">
+          <div style="font-size:8px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;">Q4 2025 executed</div>
+          <div style="font-size:16px;font-weight:800;color:var(--hnge);">$65M</div>
+          <div style="font-size:9px;font-weight:500;color:var(--muted);margin-top:3px;">1.4M shares · 36% of FY2025 FCF</div>
+        </div>
+        <div style="background:var(--panel);padding:12px 14px;">
+          <div style="font-size:8px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;">Remaining</div>
+          <div style="font-size:16px;font-weight:800;color:var(--hnge);">~$185M</div>
+          <div style="font-size:9px;font-weight:500;color:var(--muted);margin-top:3px;">As of YE2025 · funded from FCF</div>
+        </div>
+      </div>
+      <p style="font-size:11px;font-weight:500;color:var(--muted);line-height:1.8;margin:0;">Funded entirely from operating FCF and existing cash — no balance sheet impairment. Management has also begun reporting FCF per share ($2.12 for FY2025) and stated intent to grow it "through both increased cash flow and buybacks" — a deliberate shift in investor communication toward per-share value creation. 2026 diluted share guidance of 85–87M shares is stated "excluding further repurchases," signaling additional execution is expected.</p>
+    </div>
+
+    <p class="memo-body">The repurchase program influences HNGE's multiple favorability through two distinct channels. First, mechanically: retiring shares reduces market cap and therefore EV at any given price, directly compressing EV/Revenue and EV/FCF multiples over time without requiring stock price movement. With $185M of authorization remaining and FCF continuing to build, this share count reduction effect compounds — HNGE's forward multiples improve not only because revenue and FCF are growing, but because the denominator is being actively managed downward. Second, structurally: capital return at scale signals to institutional investors that FCF generation exceeds reinvestment needs. That framing attracts longer-duration holders who anchor to earnings quality rather than growth, supporting multiple stability precisely as revenue growth decelerates toward the 25% guided rate. Management's deliberate shift to FCF-per-share reporting reinforces this investor base migration.</p>
+
+    <div class="memo-bullet"><span class="memo-bold">What the timing signals:</span> Authorizing a $250M buyback at five months post-IPO — before lockup expirations are fully resolved, before the investor base has fully stabilized — is an unusually confident capital allocation decision. It is only credible when FCF is large, durable, and management has high conviction in intrinsic value. The fact that HNGE deployed $65M in a single quarter while ending the year with $479M in cash and zero debt illustrates a balance sheet that is generating surplus capital beyond its organic growth needs.</div>
+    <div class="memo-bullet"><span class="memo-bold">The SBC offset dynamic:</span> Management explicitly framed the buyback as a mechanism to "offset future dilution." HNGE's SBC dilution trended below 3% of shares outstanding in FY2025 and is guided to decline. The buyback converts what would otherwise be a dilutive equity comp program into a net share count reduction — directly accretive to per-share FCF. This is a flywheel available only to businesses generating FCF well in excess of their equity comp obligations.</div>
+    <div class="memo-bullet"><span class="memo-bold">The OMDA contrast — and what changes it:</span> OMDA's $12.4M of FY2025 FCF makes any equivalent capital return program structurally impossible at this stage. This is not a criticism — it reflects where OMDA sits in its maturation curve. The relevant planning question is what FCF scale unlocks this optionality. At 10% FCF margin on $317M of guided 2026 revenue, OMDA would generate ~$32M of annual FCF — enough to cover organic needs but not capital return. At 15%+ FCF margin on $400M+ revenue (a plausible 2027–2028 scenario), FCF of $60M+ begins to create the conditions for a similar conversation. Until then, the capital return optionality gap is itself a component of the valuation discount.</div>
+  </div>
+
+  <!-- VI. RULE OF 40 -->
+  <div class="memo-section">
+    <div class="memo-h1">VI. Rule of 40 Analysis — All Reported Periods</div>
+    <p class="memo-body">The Rule of 40 (revenue growth % + FCF margin %) is the primary efficiency metric tracked by institutional growth and quality-growth funds. The FCF-based version is used throughout, consistent with HNGE's own disclosed methodology.</p>
+    <p class="memo-body"><strong style="color:var(--omda)">Critical FY2026 Forward Observation:</strong> As both companies decelerate toward their FY2026 guided growth rates, Rule of 40 scores will compress unless FCF margins expand proportionally. HNGE is estimated to hold a Rule of 40 in the 45–50 range — remaining best-in-class. OMDA, at ~22% guided revenue growth with FCF margins estimated at ~5%, faces a Rule of 40 of approximately 27 in FY2026 — below the 40 threshold and exiting the elite tier entirely as growth normalizes. This is the most significant forward risk to OMDA's valuation multiple.</p>
+
+    <table class="memo-tbl">
+      <thead><tr>
+        <th style="text-align:left">Company</th><th style="text-align:left">Year</th><th>Rev Growth</th><th>FCF Margin</th><th>Score</th><th style="text-align:left">Commentary</th>
+      </tr></thead>
+      <tbody>
+        <tr class="memo-tbl-sec omda-sec"><td colspan="6">OMDA — Omada Health</td></tr>
+        <tr><td class="memo-tbl-lbl">OMDA</td><td>FY 2022</td><td>—</td><td class="neg">~(83%)</td><td class="neg">N/M</td><td class="memo-tbl-note">FCF burn overwhelming growth; pre-scale</td></tr>
+        <tr class="alt"><td class="memo-tbl-lbl">OMDA</td><td>FY 2023</td><td>+38%</td><td class="neg">~(40%)</td><td class="neg">(2)</td><td class="memo-tbl-note">Growth accelerating; significant FCF burn</td></tr>
+        <tr><td class="memo-tbl-lbl">OMDA</td><td>FY 2024</td><td>+38%</td><td class="neg">(22%)</td><td class="gld">16</td><td class="memo-tbl-note">Meaningful progress; approaching threshold</td></tr>
+        <tr class="alt"><td class="memo-tbl-lbl">OMDA</td><td>FY 2025 ★</td><td class="pos">+53%</td><td class="pos">+4.8%</td><td class="pos b">58</td><td class="memo-tbl-note">First year crossing 40; FCF+ milestone</td></tr>
+        <tr><td class="memo-tbl-lbl">OMDA</td><td>2026E ⚠</td><td>+22%</td><td>~+5%</td><td class="neg b">~27</td><td class="memo-tbl-note">Growth deceleration; likely exits elite tier</td></tr>
+        <tr class="memo-tbl-sec hnge-sec"><td colspan="6">HNGE — Hinge Health</td></tr>
+        <tr><td class="memo-tbl-lbl">HNGE</td><td>FY 2023</td><td>+51%</td><td class="neg">(23%)</td><td class="gld">28</td><td class="memo-tbl-note">High growth; heavy investment phase</td></tr>
+        <tr class="alt"><td class="memo-tbl-lbl">HNGE</td><td>FY 2024</td><td>+33%</td><td class="pos">+12%</td><td class="pos">45</td><td class="memo-tbl-note">FCF+ inflection; crossed 40 threshold</td></tr>
+        <tr><td class="memo-tbl-lbl">HNGE</td><td>FY 2025 ★</td><td class="pos">+51%</td><td class="pos">+31%</td><td class="pos b" style="color:var(--hnge)">81</td><td class="memo-tbl-note">Company self-reported; elite global tier</td></tr>
+        <tr class="alt"><td class="memo-tbl-lbl">HNGE</td><td>2026E</td><td>+25%</td><td>~+30%+</td><td class="gld">~45–50</td><td class="memo-tbl-note">Durable even at lower growth; FCF expanding</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- VII. GROSS MARGIN STRUCTURE -->
+  <div class="memo-section">
+    <div class="memo-h1">VII. Gross Margin Structure — Services Parity and the Blended Gap</div>
+    <p class="memo-body">OMDA's blended GAAP gross margin of 65.7% in FY2025 is frequently cited as a significant gap versus HNGE's 80%. The more useful framing begins one level down: OMDA's services segment — health coaching, clinical specialists, and care delivery — generated a 78.5% GAAP gross margin in FY2025, within 1.5 points of HNGE's 80% on a like-for-like basis. The blended figure reflects the cost structure of connected devices, which are clinically integral to OMDA's cardiometabolic and GLP-1 programs rather than a discretionary component of the model.</p>
+
+    <table class="memo-tbl" style="margin-bottom:16px;">
+      <thead><tr>
+        <th style="text-align:left">Segment (FY2025, GAAP)</th><th>Revenue</th><th>COR</th><th>Gross Profit / (Loss) &amp; Margin</th>
+      </tr></thead>
+      <tbody>
+        <tr><td class="memo-tbl-lbl">OMDA: Services</td><td>$241.0M</td><td>$51.8M</td><td class="pos">+$189.2M &nbsp;(78.5% GAAP GM)</td></tr>
+        <tr class="alt"><td class="memo-tbl-lbl">OMDA: Hardware</td><td>$19.2M</td><td>$37.4M</td><td class="neg b">$(18.2M) &nbsp;(−95% GAAP GM)</td></tr>
+        <tr><td class="memo-tbl-lbl">OMDA: Total Blended</td><td>$260.2M</td><td>$89.3M</td><td class="pos">+$170.9M &nbsp;(65.7% GAAP GM)</td></tr>
+        <tr class="alt"><td class="memo-tbl-lbl">HNGE: Total (no hardware segment)</td><td>$587.9M</td><td>$119.6M</td><td class="pos">+$468.3M &nbsp;(79.6% GAAP GM)</td></tr>
+      </tbody>
+    </table>
+
+    <p class="memo-body">OMDA's services segment generates a 78.5% GAAP gross margin — competitive with HNGE's 80% on a like-for-like basis. The connected device segment ($19.2M revenue against $37.4M COR) carries a net cost that pulls the blended GAAP margin to 65.7% — a 14.3-point gap versus HNGE's 80%. This gap is a direct reflection of the device-dependent clinical model, not a signal of underlying care delivery inefficiency.</p>
+    <p class="memo-body">As GLP-1 program enrollment grows — having tripled to 150,000 members in FY2025 — device volume and associated costs may scale proportionally. Services margin has additional room for expansion through care team efficiency and AI-driven automation, and represents the more significant driver of blended gross margin improvement over time. The device cost structure is an architectural feature of the current model and is expected to persist as long as device-dependent programs remain central to OMDA's growth strategy.</p>
+  </div>
+
+  <!-- VIII. MULTIPLE EXPANSION FRAMEWORK -->
+  <div class="memo-section">
+    <div class="memo-h1">VIII. Multiple Expansion Framework — Gap Closability Analysis</div>
+    <p class="memo-body">The following table assesses each structural driver of the HNGE/OMDA multiple differential against the FY2026 guidance window. The test for each driver is binary: does the gap close meaningfully within twelve months based only on published guidance?</p>
+
+    <table class="memo-tbl" style="margin-bottom:16px;">
+      <thead><tr>
+        <th style="text-align:left">Driver</th><th style="text-align:left">OMDA (FY2026)</th><th style="text-align:left">HNGE (FY2026)</th><th>Gap Closes FY2026?</th><th style="text-align:left">What Would Close It</th>
+      </tr></thead>
+      <tbody>
+        <tr><td class="memo-tbl-lbl">Non-GAAP Op. Margin</td><td>~2.5% Adj. EBITDA now; no equiv. guidance</td><td>~21% guided</td><td class="neg">No — ~18pt gap persists</td><td>Multi-year margin expansion</td></tr>
+        <tr class="alt"><td class="memo-tbl-lbl">FCF Margin</td><td>~5%; no FCF guidance given</td><td>~30%+ (est.)</td><td class="neg">No — ~25pt gap persists</td><td>Double-digit FCF margins (2027+E)</td></tr>
+        <tr><td class="memo-tbl-lbl">Gross Margin (GAAP)</td><td>65.7% GAAP; device costs ongoing</td><td>80% GAAP</td><td class="neg">No — 14pt structural gap</td><td>Services margin expansion + device cost efficiencies over time</td></tr>
+        <tr class="alt"><td class="memo-tbl-lbl">Revenue Scale</td><td>$317M guided</td><td>$737M guided</td><td class="neg">No — 2.3× gap holds</td><td>4–5 years at guided growth rates</td></tr>
+        <tr><td class="memo-tbl-lbl">Rule of 40</td><td>~27 (22% gr + ~5% FCF)</td><td>~45–50 (25% gr + ~20% FCF)</td><td class="neg">No — likely diverges</td><td>Sustained FCF margin expansion</td></tr>
+        <tr class="alt"><td class="memo-tbl-lbl">Incr. Margin Quality</td><td>~40¢ per rev. dollar (swing)</td><td>~73¢ per rev. dollar</td><td class="neg">No — ~1.8× gap persists</td><td>Sustained expansion toward 60¢+</td></tr>
+        <tr><td class="memo-tbl-lbl">GLP-1 Conc. Risk</td><td>Concentrated; tripled to 150K members</td><td>Not applicable (MSK)</td><td class="neg">No — requires diversification</td><td>Multi-year product expansion</td></tr>
+      </tbody>
+    </table>
+
+    <p class="memo-body"><strong>Conclusion:</strong> Zero of the seven identified drivers close meaningfully within the FY2026 guidance window. This does not mean OMDA is a poor business or that its stock lacks upside over a multi-year horizon — it means the multiple re-rating case requires a sustained execution journey that must be earned over time, not assumed from current results or near-term guidance.</p>
+
+    <div class="memo-h2">What Would Actually Close the Gap</div>
+    <p class="memo-body">The following conditions would need to be satisfied, likely over a 2027–2028 timeframe, to justify meaningful multiple convergence:</p>
+    <div class="memo-bullet"><span class="memo-bold">Sustained full-year FCF margins of 10–15%+:</span> Not a single-quarter event. The market requires multiple consecutive years of FCF generation at scale to re-anchor intrinsic value away from revenue-based frameworks.</div>
+    <div class="memo-bullet"><span class="memo-bold">Gross margin expansion through services efficiency:</span> Services margin has the most meaningful room to run, driven by AI-assisted care delivery, care team leverage, and program mix. Device cost structure is an ongoing feature of the clinical model; efficiency gains there are incremental rather than transformational.</div>
+    <div class="memo-bullet"><span class="memo-bold">Demonstrated incremental margin improvement toward 60¢+ per revenue dollar:</span> Currently at ~40¢ per incremental revenue dollar, OMDA needs to expand this ratio toward 60¢+ to demonstrate the operating leverage profile that supports earnings multiple re-rating.</div>
+    <div class="memo-bullet"><span class="memo-bold">GLP-1 revenue diversification:</span> OMDA's GLP-1 concentration needs to be balanced by growth in other chronic condition programs (cholesterol, MSK, behavioral health) that do not carry hardware cost dependencies.</div>
+    <div class="memo-bullet"><span class="memo-bold">Maintained 20%+ revenue growth alongside improving margins:</span> Multiple expansion requires both levers simultaneously. If revenue growth decelerates to the mid-teens while FCF margins are still in low single digits, the re-rating case weakens.</div>
+  </div>
+
+  <!-- IX. COMPETITIVE POSITIONING -->
+  <div class="memo-section">
+    <div class="memo-h1">IX. Competitive Positioning &amp; Strategic Context</div>
+
+    <div class="memo-h2">Market Intersection</div>
+    <p class="memo-body">HNGE and OMDA are frequently compared as "digital health peers," but they are structurally different platforms addressing different conditions with different business models. HNGE is a pure-play MSK platform with hardware-enhanced, AI-first delivery. OMDA is a multi-condition cardiometabolic platform with human-led care teams augmented by AI and connected devices. The two are beginning to overlap — OMDA offers Omada for MSK, and HNGE has announced plans to expand beyond MSK — and competitive overlap will intensify over 2026–2028 as both platforms seek to expand their share of employer health benefit budgets.</p>
+
+    <div class="memo-h2">GLP-1 Dynamic</div>
+    <p class="memo-body">GLP-1 medications represent the most significant strategic variable for OMDA. Having supported 150,000+ members on GLP-1s, Omada has repositioned as a GLP-1 enabler — launching GLP-1 Flex Care, a new prescribing service, and a cholesterol management program. This is a genuine strategic asset. The risk is concentration: if GLP-1 reimbursement policies change or competitors enter with lower-cost companion programs, OMDA's primary growth engine could be disrupted in ways that HNGE — whose MSK platform has no equivalent drug class dependency — does not face.</p>
+    <p class="memo-body">For HNGE, GLP-1s are a more nuanced dynamic: weight loss reduces obesity-driven MSK deterioration over the long term, potentially reducing the addressable population. However, GLP-1 use also increases exercise engagement, and Hinge's platform is well-positioned to support members in physical conditioning during and after GLP-1 therapy. Net effect on HNGE's addressable market is not yet quantifiable.</p>
+
+    <div class="memo-h2">Key Risks by Company</div>
+    <div class="memo-bullet"><span class="memo-bold" style="color:var(--hnge)">HNGE:</span> Customer concentration (Health Care Services Corp 17%, Elevance 14%, Aetna 12% of FY2024 revenue). Contract terminability by health plan partners. Potential commoditization of virtual MSK as competitors scale. Long-term GLP-1 impact on MSK surgery utilization and addressable market.</div>
+    <div class="memo-bullet"><span class="memo-bold" style="color:var(--omda)">OMDA:</span> Connected device cost structure that may scale with GLP-1 program growth. Human care team labor as a factor in services margin expansion pace. Channel partner concentration (Cigna affiliate ~31% of Q1 2025 revenue per S-1). GLP-1 reimbursement policy risk. Single-quarter GAAP profitability history — track record of sustained profitability not yet established.</div>
+  </div>
+
+  <!-- X. CONCLUSIONS -->
+  <div class="memo-section">
+    <div class="memo-h1">X. Conclusions</div>
+
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div style="background:var(--panel);border:1.5px solid var(--line);border-radius:10px;padding:20px 24px;border-left:3px solid var(--teal);">
+        <div style="font-size:10px;font-weight:700;color:var(--text);margin-bottom:8px;">1. HNGE's valuation premium is rationally priced, not excessive, even at corrected lower prices.</div>
+        <p class="memo-body" style="margin:0;">At ~$2.88B EV against $587.9M FY2025 revenue, $179.6M FCF, and $119.5M Non-GAAP operating income, HNGE's multiples are high but defensible. EV/FCF of ~16.0× on a business growing 51% with 31% FCF margins is not stretched by institutional quality-growth frameworks. The $250M buyback program — initiated five months post-IPO and funded entirely from operating FCF — further illustrates the degree to which HNGE's capital generation exceeds its organic reinvestment needs.</p>
+      </div>
+      <div style="background:var(--panel);border:1.5px solid var(--line);border-radius:10px;padding:20px 24px;border-left:3px solid var(--teal);">
+        <div style="font-size:10px;font-weight:700;color:var(--text);margin-bottom:8px;">2. OMDA is counterintuitively more expensive than HNGE on cash flow metrics.</div>
+        <p class="memo-body" style="margin:0;">OMDA's ~1.8× forward EV/Revenue looks modest relative to HNGE's ~3.9×. But OMDA's ~46× trailing EV/FCF vs. HNGE's ~16.0× reveals the reality: each dollar of OMDA revenue converts to far less cash. This is the precise reason simple revenue multiple comparisons are insufficient for analyzing these two businesses.</p>
+      </div>
+      <div style="background:var(--panel);border:1.5px solid var(--line);border-radius:10px;padding:20px 24px;border-left:3px solid var(--teal);">
+        <div style="font-size:10px;font-weight:700;color:var(--text);margin-bottom:8px;">3. Incremental margin is the right metric — but the methodology matters.</div>
+        <p class="memo-body" style="margin:0;">HNGE retained ~73¢ of every incremental FY2025 revenue dollar. Using the correct swing methodology for OMDA yields approximately 40¢ per incremental dollar — a real gap (~1.8×), but not the ~10× figure that circulates when the comparison is constructed incorrectly. OMDA's 40¢ incremental margin is a legitimate starting point, and sustaining or expanding it toward 60¢+ is the specific operational path to closing the multiple gap.</p>
+      </div>
+      <div style="background:var(--panel);border:1.5px solid var(--line);border-radius:10px;padding:20px 24px;border-left:3px solid var(--teal);">
+        <div style="font-size:10px;font-weight:700;color:var(--text);margin-bottom:8px;">4. OMDA's FY2025 profitability milestones are genuine and important — but they mark a starting point.</div>
+        <p class="memo-body" style="margin:0;">First FCF-positive year, first Adj. EBITDA-positive year, first GAAP-profitable quarter. These are real inflection signals. But the distance from a first profitable quarter to HNGE's current operating profile — $120M Non-GAAP operating income, $180M FCF, $250M buyback, Rule of 40 of 81 — is measured in years, not quarters.</p>
+      </div>
+      <div style="background:var(--panel);border:1.5px solid var(--line);border-radius:10px;padding:20px 24px;border-left:3px solid var(--omda);">
+        <div style="font-size:10px;font-weight:700;color:var(--text);margin-bottom:8px;">5. The Rule of 40 forward observation is the most underappreciated risk to OMDA's near-term multiple.</div>
+        <p class="memo-body" style="margin:0;">OMDA's Rule of 40 of 58 in FY2025 crossed into elite territory for the first time. But at guided ~22% revenue growth with FCF margins estimated at ~5%, FY2026 Rule of 40 of approximately 27 re-enters Growth Investment Phase — below best-in-class. Institutional Rule-of-40-anchored funds that entered at 58+ may reassess their position as growth decelerates without commensurate FCF expansion. This is a real near-term multiple headwind not yet widely discussed.</p>
+      </div>
+      <div style="background:var(--panel);border:1.5px solid var(--line);border-radius:10px;padding:20px 24px;border-left:3px solid var(--teal);">
+        <div style="font-size:10px;font-weight:700;color:var(--text);margin-bottom:8px;">6. Both companies are well-positioned for continued long-term value creation.</div>
+        <p class="memo-body" style="margin:0;">The goal of this analysis is precision: to identify exactly why the multiples differ, by how much, and whether those gaps are likely to close. The answer is that they are rational, durable within the FY2026 window, and require a specific multi-year execution journey from OMDA to close. That journey is plausible. It is not yet guidable.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- APPENDIX -->
+  <div class="memo-section">
+    <div class="memo-h1">Appendix: Definitions, Methodology &amp; Data Sources</div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <p class="memo-body"><strong>Revenue:</strong> GAAP total revenue as reported in SEC filings. All figures audited unless noted as preliminary.</p>
+      <p class="memo-body"><strong>Gross Profit / Margin:</strong> GAAP: Total Revenue minus Cost of Revenue per income statement. Non-GAAP (both companies): Adds back SBC and D&amp;A allocated to Cost of Revenue.</p>
+      <p class="memo-body"><strong>Adj. EBITDA (OMDA):</strong> Directly disclosed by OMDA. Net Loss + interest expense + interest income + fair value of warrants + loss on debt extinguishment + income taxes + SBC + amortization of intangibles + D&amp;A + loss on asset disposal. FY2025 audited: +$6.5M.</p>
+      <p class="memo-body"><strong>Non-GAAP Operating Income (HNGE):</strong> GAAP operating income (loss) excluding SBC, employer payroll taxes on SBC, amortization of intangibles, restructuring, and other one-time items. FY2025: $119.5M. HNGE's primary non-GAAP measure. Estimated Adj. EBITDA = Non-GAAP Operating Income + D&amp;A (~$5.1M in FY2025).</p>
+      <p class="memo-body"><strong>Free Cash Flow:</strong> Net cash from operating activities minus capex (PP&amp;E purchases) minus capitalized internal-use software costs. Both companies disclose FCF directly in earnings releases.</p>
+      <p class="memo-body"><strong>Incremental Operating Margin:</strong> Change in Non-GAAP Operating Income (HNGE) or Adj. EBITDA (OMDA) divided by change in Revenue between FY2024 and FY2025. Represents cents of operating profit per incremental revenue dollar.</p>
+      <p class="memo-body"><strong>Rule of 40:</strong> Revenue Growth Rate (YoY %) + FCF Margin (FCF ÷ Revenue). FCF-based throughout for consistency with HNGE's own disclosure (company reported 81 in FY2025 Q4 earnings release).</p>
+      <p class="memo-body"><strong>Enterprise Value:</strong> Market Capitalization minus Cash and Cash Equivalents (including marketable securities). HNGE: ~82M diluted shares × ~$41/sh = ~$3.36B mkt cap; less $478.8M net cash = ~$2.88B EV. OMDA: ~58.4M shares × ~$13.50/sh = ~$789M mkt cap; less $222M cash = ~$567M EV. Prices as of late March 2026; refresh before reliance.</p>
+      <p class="memo-body"><strong>Data Sources:</strong> HNGE: S-1 registration statement (filed March 10, 2025, EDGAR); Q4 &amp; FY2025 Earnings Press Release and SEC Exhibit 99.1 (filed February 10, 2026). OMDA: 424B4 Final Prospectus (filed June 5, 2025, EDGAR); Q4 &amp; FY2025 Earnings Press Release (March 5, 2026). Where figures differ between sources, the more recent audited filing governs.</p>
+      <p class="memo-body" style="color:var(--neg);"><strong>Disclaimer:</strong> This memo is for internal informational purposes only and does not constitute investment advice or a solicitation to buy or sell any security. EV calculations are approximations based on estimated market prices and should be verified before reliance.</p>
+    </div>
+  </div>
+
+</div>
+</div><!-- /tab-memo -->
+
+
+<!-- ══════════════════════════════════════════════
+     TAB 1 — HISTORICAL ANALYSIS
+══════════════════════════════════════════════ -->
+<div id="tab-analysis" class="tab-panel">
+
+<!-- 01 SNAPSHOT -->
+<div class="section-wrap">
+  <div class="section-label"><span class="section-num">01</span> FY2025 Full-Year Snapshot</div>
+  <div class="co-row">
+    <div class="co-badge omda">
+      <div class="co-ticker omda">OMDA</div>
+      <div class="co-info">
+        <div class="co-name">Omada Health</div>
+        <div class="co-desc">Cardiometabolic + MSK virtual care · Human-led care teams + AI · Outcomes-based billing</div>
+      </div>
+    </div>
+    <div class="co-badge hnge">
+      <div class="co-ticker hnge">HNGE</div>
+      <div class="co-info">
+        <div class="co-name">Hinge Health</div>
+        <div class="co-desc">AI-powered MSK platform · Employer &amp; health plan subscriptions · Pure software delivery</div>
+      </div>
+    </div>
+  </div>
+  <div class="kpi-strip">
+    <div class="kpi-half" style="border-top:3px solid var(--omda)">
+      <div class="kpi-cell"><div class="kpi-lbl">FY2025 Revenue</div><div class="kpi-val" style="color:var(--omda)">$260.2M</div><div class="kpi-sub">+53% YoY</div></div>
+      <div class="kpi-cell"><div class="kpi-lbl">GAAP Gross Margin</div><div class="kpi-val" style="color:var(--omda)">65.7%</div><div class="kpi-sub">+510 bps vs. FY2024 · HW drag</div></div>
+      <div class="kpi-cell" style="border-bottom:none"><div class="kpi-lbl">Adj. EBITDA</div><div class="kpi-val" style="color:var(--pos)">+$6.5M</div><div class="kpi-sub">+2.5% margin · First positive year</div></div>
+      <div class="kpi-cell" style="border-bottom:none"><div class="kpi-lbl">Free Cash Flow</div><div class="kpi-val" style="color:var(--pos)">+$12.4M</div><div class="kpi-sub">+4.8% FCF margin · First positive year</div></div>
+    </div>
+    <div class="kpi-half" style="border-top:3px solid var(--hnge)">
+      <div class="kpi-cell"><div class="kpi-lbl">FY2025 Revenue</div><div class="kpi-val" style="color:var(--hnge)">$587.9M</div><div class="kpi-sub">+51% YoY</div></div>
+      <div class="kpi-cell"><div class="kpi-lbl">GAAP Gross Margin</div><div class="kpi-val" style="color:var(--hnge)">80%</div><div class="kpi-sub">+300 bps vs. FY2024</div></div>
+      <div class="kpi-cell" style="border-bottom:none"><div class="kpi-lbl">Adj. EBITDA</div><div class="kpi-val" style="color:var(--pos)">+$124.6M</div><div class="kpi-sub">+21% margin</div></div>
+      <div class="kpi-cell" style="border-bottom:none"><div class="kpi-lbl">Free Cash Flow</div><div class="kpi-val" style="color:var(--pos)">+$179.6M</div><div class="kpi-sub">+31% FCF margin</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- SYNTHESIS — TOP OF ANALYSIS -->
+<div class="section-wrap">
+  <div style="background:var(--teal);border-radius:10px;padding:28px 32px;margin-bottom:0;">
+    <div style="font-size:8.5px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:14px;">The Core Finding</div>
+    <div style="font-size:17px;font-weight:700;color:#fff;line-height:1.55;margin-bottom:18px;">OMDA and HNGE grew revenue at the same rate in FY2025 — +53% vs. +51% — yet HNGE generated <span style="color:rgba(243,105,63,1)">$179.6M of free cash flow</span> against OMDA's <span style="color:rgba(243,105,63,0.75)">$12.4M</span>. Closing that gap requires addressing three structural drivers: Cost of Revenue efficiency, incremental margin conversion, and operating profitability at scale.</div>
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:rgba(255,255,255,0.12);border-radius:6px;overflow:hidden;margin-bottom:18px;">
+      <div style="background:rgba(0,0,0,0.2);padding:14px 16px;">
+        <div style="font-size:8px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:6px;">Gross margin structure</div>
+        <div style="font-size:13px;font-weight:700;color:#fff;">65.7% blended vs. 78.5% services-only</div>
+        <div style="font-size:10.5px;font-weight:500;color:rgba(255,255,255,0.6);margin-top:4px;line-height:1.65;">Services-only GM is within 1.5pts of HNGE's 80%. The blended gap reflects device costs that are clinically integral to the cardiometabolic and GLP-1 model — a structural limitation to near-term expansion</div>
+      </div>
+      <div style="background:rgba(0,0,0,0.2);padding:14px 16px;">
+        <div style="font-size:8px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:6px;">Incremental margin</div>
+        <div style="font-size:13px;font-weight:700;color:#fff;">40¢ vs. 73¢ per new dollar</div>
+        <div style="font-size:10.5px;font-weight:500;color:rgba(255,255,255,0.6);margin-top:4px;line-height:1.65;">OMDA's profit conversion is improving but HNGE's operating leverage — built at scale — is compounding ahead</div>
+      </div>
+      <div style="background:rgba(0,0,0,0.2);padding:14px 16px;">
+        <div style="font-size:8px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:6px;">Profitability scale</div>
+        <div style="font-size:13px;font-weight:700;color:#fff;">$119.5M vs. $6.5M EBITDA</div>
+        <div style="font-size:10.5px;font-weight:500;color:rgba(255,255,255,0.6);margin-top:4px;line-height:1.65;">OMDA is ~3–4 years behind HNGE's current profit profile at guided growth rates — a gap that is closeable but not imminent</div>
+      </div>
+    </div>
+    <div style="font-size:11px;font-weight:500;color:rgba(255,255,255,0.6);line-height:1.8;">The valuation gap — HNGE at ~$2.88B EV, OMDA at ~$567M — follows directly from this cash conversion differential. OMDA's revenue multiple discount is not a market mispricing; it reflects the market pricing each dollar of OMDA revenue at a lower intrinsic value because less of it reaches the balance sheet. The path to re-rating runs through services margin expansion, FCF conversion above 10%, and demonstrating that FY2025's profitability inflection was structural — not a single-year event.</div>
+  </div>
+</div>
+
+<!-- 02 REVENUE -->
+<div class="section-wrap">
+  <div class="section-label"><span class="section-num">02</span> Revenue History — FY2022 through FY2025 + FY2026 Guidance Midpoints</div>
+  <div class="rev-grid">
+    <div class="rev-yr-lbl">FY 2022</div>
+    <div class="rev-bars">
+      <div class="rev-bar-row"><div class="rev-co" style="color:var(--omda)">OMDA</div><div class="rev-track"><div class="rev-fill o" style="width:12%">$89.2M</div></div><div class="rev-growth dim">—</div></div>
+      <div class="rev-bar-row"><div class="rev-co" style="color:var(--hnge)">HNGE</div><div class="rev-track"><div class="rev-fill h" style="width:26%">$194.4M</div></div><div class="rev-growth dim">+31%</div></div>
+    </div>
+    <div class="rev-sep"></div>
+    <div class="rev-yr-lbl">FY 2023</div>
+    <div class="rev-bars">
+      <div class="rev-bar-row"><div class="rev-co" style="color:var(--omda)">OMDA</div><div class="rev-track"><div class="rev-fill o" style="width:16.6%">$122.8M</div></div><div class="rev-growth pos">+38%</div></div>
+      <div class="rev-bar-row"><div class="rev-co" style="color:var(--hnge)">HNGE</div><div class="rev-track"><div class="rev-fill h" style="width:39.6%">$292.7M</div></div><div class="rev-growth pos">+51%</div></div>
+    </div>
+    <div class="rev-sep"></div>
+    <div class="rev-yr-lbl">FY 2024</div>
+    <div class="rev-bars">
+      <div class="rev-bar-row"><div class="rev-co" style="color:var(--omda)">OMDA</div><div class="rev-track"><div class="rev-fill o" style="width:23%">$169.8M</div></div><div class="rev-growth pos">+38%</div></div>
+      <div class="rev-bar-row"><div class="rev-co" style="color:var(--hnge)">HNGE</div><div class="rev-track"><div class="rev-fill h" style="width:52.9%">$390.4M</div></div><div class="rev-growth dim">+33%</div></div>
+    </div>
+    <div class="rev-sep"></div>
+    <div class="rev-yr-lbl">FY 2025</div>
+    <div class="rev-bars">
+      <div class="rev-bar-row"><div class="rev-co" style="color:var(--omda)">OMDA</div><div class="rev-track"><div class="rev-fill o" style="width:35.2%">$260.2M</div></div><div class="rev-growth pos">+53%</div></div>
+      <div class="rev-bar-row"><div class="rev-co" style="color:var(--hnge)">HNGE</div><div class="rev-track"><div class="rev-fill h" style="width:79.7%">$587.9M</div></div><div class="rev-growth pos">+51%</div></div>
+    </div>
+    <div class="rev-sep"></div>
+    <div class="rev-yr-lbl" style="color:var(--coral);font-weight:800">FY 2026E &nbsp;·&nbsp; Guidance Midpoints</div>
+    <div class="rev-bars">
+      <div class="rev-bar-row"><div class="rev-co" style="color:var(--omda)">OMDA</div><div class="rev-track"><div class="rev-fill g" style="width:43%">$317M guided</div></div><div class="rev-growth gld">+22%</div></div>
+      <div class="rev-bar-row"><div class="rev-co" style="color:var(--hnge)">HNGE</div><div class="rev-track"><div class="rev-fill g" style="width:100%">$737M guided</div></div><div class="rev-growth gld">+25%</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- 03 P&L TABLE -->
+<div class="section-wrap">
+  <div class="section-label"><span class="section-num">03</span> Income Statement — Historical Detail · All Gross Margins GAAP</div>
+  <div style="background:var(--panel);border:1.5px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:30px;">
+    <table class="dt">
+      <thead>
+        <tr>
+          <th>Metric ($M)</th>
+          <th>FY 2022</th><th>FY 2023</th><th>FY 2024</th><th>FY 2025</th><th>2026E</th>
+          <th style="text-align:left;padding-left:10px">Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="s-row"><td colspan="7" style="color:var(--omda)">OMDA — Omada Health</td></tr>
+        <tr class="oa"><td>Revenue</td><td class="dim">$89.2</td><td>$122.8</td><td>$169.8</td><td class="pos">$260.2</td><td class="gld">$317M¹</td><td style="text-align:left;padding-left:10px"></td></tr>
+        <tr class="oa"><td>YoY Growth</td><td class="na">—</td><td class="pos">+38%</td><td class="pos">+38%</td><td class="pos">+53%</td><td class="gld">~+22%</td><td style="text-align:left;padding-left:10px"></td></tr>
+        <tr class="oa"><td>Gross Profit</td><td class="dim">$42.8</td><td>$70.0</td><td>$102.9</td><td class="pos">$170.9</td><td class="na">—</td><td style="text-align:left;padding-left:10px"></td></tr>
+        <tr class="oa"><td>GAAP Gross Margin</td><td class="neg">48%</td><td>57%</td><td>60.6%</td><td class="pos b">65.7%</td><td class="na">—</td><td style="text-align:left;padding-left:10px;font-size:9px;color:var(--muted)">48%→65.7% · +1,770 bps</td></tr>
+        <tr class="oa"><td>Hardware Rev. / Gross Loss</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="neg b">$(18.2M)</td><td class="na">—</td><td style="text-align:left;padding-left:10px;font-size:9px;color:var(--muted)">$19.2M rev · $37.4M COR</td></tr>
+        <tr class="oa"><td>Adj. EBITDA</td><td class="na">—</td><td class="na">—</td><td class="neg">$(29.4)</td><td class="pos">$6.5</td><td class="gld">$7–15M¹</td><td style="text-align:left;padding-left:10px;font-size:9px;color:var(--muted)">First positive FY25</td></tr>
+        <tr class="oa"><td>GAAP Net Loss</td><td class="neg">$(72.5)</td><td class="neg">$(67.5)</td><td class="neg">$(47.1)</td><td class="neg">$(12.8)</td><td class="na">—</td><td style="text-align:left;padding-left:10px;font-size:9px;color:var(--muted)">Q4 '25 first GAAP profit</td></tr>
+        <tr class="oa"><td>Free Cash Flow</td><td class="na">—</td><td class="neg">$(49.7)</td><td class="neg">$(38.0)</td><td class="pos">$12.4</td><td class="na">—</td><td style="text-align:left;padding-left:10px;font-size:9px;color:var(--muted)">First FCF+ in FY25</td></tr>
+        <tr class="oa"><td>FCF Margin</td><td class="na">—</td><td class="neg">(40%)</td><td class="neg">(22%)</td><td class="pos">+4.8%</td><td class="na">—</td><td style="text-align:left;padding-left:10px"></td></tr>
+        <tr class="oa"><td>Incr. Margin (¢/$rev)</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="neg b">~40¢</td><td class="na">—</td><td style="text-align:left;padding-left:10px;font-size:9px;color:var(--muted)">ΔAdj.EBITDA ÷ ΔRev. (swing)</td></tr>
+        <tr class="s-row"><td colspan="7" style="color:var(--hnge)">HNGE — Hinge Health</td></tr>
+        <tr class="ha"><td>Revenue</td><td class="dim">$194.4</td><td>$292.7</td><td>$390.4</td><td class="pos">$587.9</td><td class="gld">$737M¹</td><td style="text-align:left;padding-left:10px"></td></tr>
+        <tr class="ha"><td>YoY Growth</td><td class="dim">+31%</td><td class="pos">+51%</td><td class="dim">+33%</td><td class="pos">+51%</td><td class="gld">~+25%</td><td style="text-align:left;padding-left:10px"></td></tr>
+        <tr class="ha"><td>Gross Profit</td><td class="dim">$89.7</td><td>$194.2</td><td>$299.9</td><td class="pos">$468.2</td><td class="na">—</td><td style="text-align:left;padding-left:10px"></td></tr>
+        <tr class="ha"><td>GAAP Gross Margin</td><td class="neg">46%</td><td>66%</td><td>77%</td><td class="pos b">80%</td><td class="na">—</td><td style="text-align:left;padding-left:10px;font-size:9px;color:var(--muted)">46%→80% · +3,400 bps</td></tr>
+        <tr class="ha"><td>Non-GAAP Op. Income</td><td class="na">—</td><td class="neg">$(56.4)</td><td class="neg">$(26.1)</td><td class="pos">$119.5</td><td class="gld">$153.5M¹</td><td style="text-align:left;padding-left:10px;font-size:9px;color:var(--muted)">Primary non-GAAP metric</td></tr>
+        <tr class="ha"><td>Adj. EBITDA (est.)³</td><td class="na">—</td><td class="neg">$(50.5)</td><td class="neg">$(20.2)</td><td class="pos">$124.6</td><td class="na">—</td><td style="text-align:left;padding-left:10px;font-size:9px;color:var(--muted)">Non-GAAP Op.I + D&amp;A</td></tr>
+        <tr class="ha"><td>GAAP Net Inc (Loss)</td><td class="neg">$(218)</td><td class="neg">$(108.1)</td><td class="neg">$(11.9)</td><td class="neg">$(528)²</td><td class="na">—</td><td style="text-align:left;padding-left:10px;font-size:9px;color:var(--muted)">FY25: $643M IPO SBC</td></tr>
+        <tr class="ha"><td>Free Cash Flow</td><td class="na">—</td><td class="neg">$(68.5)</td><td class="pos">$45.2</td><td class="pos">$179.6</td><td class="na">—</td><td style="text-align:left;padding-left:10px;font-size:9px;color:var(--muted)">FCF+ from FY2024</td></tr>
+        <tr class="ha"><td>FCF Margin</td><td class="na">—</td><td class="neg">(23%)</td><td class="pos">+12%</td><td class="pos">+31%</td><td class="na">—</td><td style="text-align:left;padding-left:10px"></td></tr>
+        <tr class="ha"><td>Incr. Margin (¢/$rev)</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="pos b">~73¢</td><td class="na">—</td><td style="text-align:left;padding-left:10px;font-size:9px;color:var(--muted)">ΔNon-GAAP Op.I ÷ ΔRev.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 04 GROSS MARGIN -->
+<div class="section-wrap">
+  <div class="section-label"><span class="section-num">04</span> GAAP Gross Margin Trajectory — Like-for-Like Comparison</div>
+  <div class="margin-grid">
+    <div class="margin-card">
+      <div class="margin-card-title" style="color:var(--omda)">OMDA · 48% → 65.7% GAAP &nbsp;(+1,770 bps)</div>
+      <div class="m-row"><div class="m-yr">2022</div><div class="m-track"><div class="m-fill lo" style="width:48%">48%</div></div></div>
+      <div class="m-row"><div class="m-yr">2023</div><div class="m-track"><div class="m-fill o" style="width:57%">57%</div></div></div>
+      <div class="m-row"><div class="m-yr">2024</div><div class="m-track"><div class="m-fill o" style="width:60.6%">60.6%</div></div></div>
+      <div class="m-row"><div class="m-yr">2025</div><div class="m-track"><div class="m-fill o" style="width:65.7%">65.7% GAAP</div></div></div>
+      <div style="margin-top:14px;font-size:11px;font-weight:500;color:var(--muted);line-height:1.75;">Services-only GAAP GM ≈ 78.5% — within 1.5 points of HNGE's 80% on a like-for-like basis. The blended 65.7% reflects connected device costs that are clinically integral to the cardiometabolic and GLP-1 programs — a structural limitation to near-term blended margin expansion.</div>
+    </div>
+    <div class="margin-card">
+      <div class="margin-card-title" style="color:var(--hnge)">HNGE · 46% → 80% GAAP &nbsp;(+3,400 bps)</div>
+      <div class="m-row"><div class="m-yr">2022</div><div class="m-track"><div class="m-fill lo" style="width:46%">46%</div></div></div>
+      <div class="m-row"><div class="m-yr">2023</div><div class="m-track"><div class="m-fill h" style="width:66%">66%</div></div></div>
+      <div class="m-row"><div class="m-yr">2024</div><div class="m-track"><div class="m-fill h" style="width:77%">77%</div></div></div>
+      <div class="m-row"><div class="m-yr">2025</div><div class="m-track"><div class="m-fill h" style="width:80%">80% GAAP</div></div></div>
+      <div style="margin-top:14px;font-size:11px;font-weight:500;color:var(--muted);line-height:1.75;">Pure software delivery model. Enso wearable costs in COR drove initial drag; care automation (~95% reduction in human PT hours per member) and scale drove expansion. No hardware gross loss.</div>
+    </div>
+  </div>
+  <div style="background:var(--panel);border:1.5px solid var(--line);border-radius:10px;padding:20px 28px;margin-bottom:30px;display:flex;align-items:center;gap:32px;">
+    <div style="text-align:center;flex-shrink:0;">
+      <div style="font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">GAAP GM Gap</div>
+      <div style="font-size:52px;font-weight:900;color:var(--neg);line-height:1;letter-spacing:-2px;">14.3 pts</div>
+      <div style="font-size:9px;font-weight:600;color:var(--muted);margin-top:4px;">65.7% (OMDA) vs. 80% (HNGE)</div>
+    </div>
+    <div style="width:1px;height:60px;background:var(--line);flex-shrink:0;"></div>
+    <div style="font-size:11px;font-weight:500;color:var(--muted);line-height:1.8;flex:1;">
+      <strong style="color:var(--text)">The 14.3-point gap is a structural feature of the current model, not a care delivery inefficiency.</strong> OMDA's services-only GAAP gross margin of ~78.5% is within 1.5 points of HNGE's 80% — parity on the core care delivery model. The blended figure reflects connected device costs that are clinically integral to the cardiometabolic and GLP-1 programs. Services margin has meaningful room to expand through care team leverage and AI-driven efficiency, and represents the more significant driver of blended gross margin improvement over time.
+    </div>
+  </div>
+</div>
+
+<!-- 05 QUARTERLY -->
+<div class="section-wrap">
+  <div class="section-label"><span class="section-num">05</span> Quarterly Data — Q1 2024 through Q4 2025</div>
+  <div style="background:var(--panel);border:1.5px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:30px;">
+    <table class="dt">
+      <thead>
+        <tr>
+          <th>Metric ($M)</th>
+          <th>Q1'24</th><th>Q2'24</th><th>Q3'24</th><th>Q4'24</th>
+          <th>Q1'25</th><th>Q2'25</th><th>Q3'25</th><th>Q4'25</th>
+          <th style="text-align:center">Trend</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="s-row"><td colspan="10" style="color:var(--omda)">OMDA — Omada Health</td></tr>
+        <tr class="oa"><td>Revenue</td><td>$35.1</td><td>$41.2</td><td>$45.6</td><td>$48.0</td><td>$55.0</td><td>$61.4</td><td>$68.4</td><td class="pos">$75.8</td><td class="pos b" style="text-align:center">↑↑</td></tr>
+        <tr class="oa"><td>YoY Growth</td><td class="pos">+57%</td><td class="dim">+40%</td><td class="dim">+35%</td><td class="dim">+29%</td><td class="pos">+57%</td><td class="pos">+49%</td><td class="pos">+50%</td><td class="pos">+58%</td><td class="pos b" style="text-align:center">↑</td></tr>
+        <tr class="oa"><td>GAAP Gross Margin</td><td class="neg">49%</td><td>60%</td><td>63%</td><td>67%</td><td class="neg">58%</td><td>66%</td><td>66%</td><td class="pos">71%</td><td class="pos b" style="text-align:center">↑</td></tr>
+        <tr class="oa"><td>Adj. EBITDA</td><td class="neg">$(10.3)</td><td class="neg">$(9.4)</td><td class="neg">$(5.8)</td><td class="neg">$(4.0)</td><td class="neg">$(4.2)</td><td class="neg">$(0.2)</td><td class="pos">$2.4</td><td class="pos">$8.5</td><td class="pos b" style="text-align:center">↑</td></tr>
+        <tr class="oa"><td>GAAP Net Inc (Loss)</td><td class="neg">$(19.0)</td><td class="neg">$(10.7)</td><td class="neg">$(9.1)</td><td class="neg">$(8.3)</td><td class="neg">$(9.4)</td><td class="neg">$(5.1)</td><td class="pos">$3.4</td><td class="pos">$5.2</td><td class="pos b" style="text-align:center">↑</td></tr>
+        <tr class="oa"><td>Free Cash Flow</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="neg">$(7.5)</td><td class="neg">$(16.1)</td><td class="neg">$(6.0)</td><td class="pos">$13.9</td><td class="pos">$20.0</td><td class="pos b" style="text-align:center">↑</td></tr>
+        <tr class="s-row"><td colspan="10" style="color:var(--hnge)">HNGE — Hinge Health</td></tr>
+        <tr class="ha"><td>Revenue</td><td>$82.7</td><td>$89.8</td><td>$100.6</td><td>$117.3</td><td>$123.8</td><td>$139.1</td><td>$154.2</td><td class="pos">$170.7</td><td class="pos b" style="text-align:center">↑↑</td></tr>
+        <tr class="ha"><td>YoY Growth</td><td class="dim">+44%</td><td class="dim">+36%</td><td class="dim">+30%</td><td class="dim">+28%</td><td class="pos">+50%</td><td class="pos">+55%</td><td class="pos">+53%</td><td class="pos">+46%</td><td class="pos b" style="text-align:center">↑</td></tr>
+        <tr class="ha"><td>GAAP Gross Margin</td><td>75%</td><td>75%</td><td>77%</td><td>82%</td><td>81%</td><td>79%</td><td>82%</td><td class="pos">84%</td><td class="pos b" style="text-align:center">↑</td></tr>
+        <tr class="ha"><td>Non-GAAP Op. Inc (Loss)</td><td class="neg">$(12.3)</td><td class="neg">$(8.6)</td><td class="neg">$(6.7)</td><td class="pos">$21.4</td><td class="pos">$23.3</td><td class="pos">$27.0</td><td class="pos">$21.2</td><td class="pos">$48.0</td><td class="pos b" style="text-align:center">↑</td></tr>
+        <tr class="ha"><td>Free Cash Flow</td><td class="na">—</td><td class="na">—</td><td class="na">—</td><td class="pos">$37.3</td><td class="pos">$12.7</td><td class="pos">$38.2</td><td class="pos">$67.2</td><td class="pos">$61.5</td><td class="pos b" style="text-align:center">↑</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 06 INCREMENTAL MARGIN -->
+<div class="section-wrap">
+  <div class="section-label"><span class="section-num">06</span> Incremental Margin Analysis — Cents of Profit per Incremental Revenue Dollar (FY2024→FY2025)</div>
+  <div class="incr-grid">
+    <div class="incr-card" style="border-top:3px solid var(--omda)">
+      <div style="font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--omda);margin-bottom:14px;">OMDA — Omada Health</div>
+      <div class="incr-cents" style="color:var(--omda)">40¢</div>
+      <div class="incr-label" style="color:var(--omda)">per incremental revenue dollar</div>
+      <div class="incr-sep"></div>
+      <div class="incr-math">
+        <strong style="color:var(--text)">Adj. EBITDA:</strong><br>
+        $(29.4M) FY2024 → +$6.5M FY2025<br>
+        Swing = <strong style="color:var(--pos)">+$35.9M</strong><br><br>
+        <strong style="color:var(--text)">Revenue:</strong><br>
+        $169.8M → $260.2M = <strong>+$90.4M</strong><br><br>
+        $35.9M ÷ $90.4M = <strong style="color:var(--omda)">39.7¢</strong>
+      </div>
+    </div>
+    <div class="incr-card" style="border-top:3px solid var(--hnge)">
+      <div style="font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--hnge);margin-bottom:14px;">HNGE — Hinge Health</div>
+      <div class="incr-cents" style="color:var(--hnge)">73¢</div>
+      <div class="incr-label" style="color:var(--hnge)">per incremental revenue dollar</div>
+      <div class="incr-sep"></div>
+      <div class="incr-math">
+        <strong style="color:var(--text)">Non-GAAP Op. Income:</strong><br>
+        $(26.1M) FY2024 → +$119.5M FY2025<br>
+        Swing = <strong style="color:var(--pos)">+$145.6M</strong><br><br>
+        <strong style="color:var(--text)">Revenue:</strong><br>
+        $390.4M → $587.9M = <strong>+$197.5M</strong><br><br>
+        $145.6M ÷ $197.5M = <strong style="color:var(--hnge)">73.5¢</strong>
+      </div>
+    </div>
+  </div>
+  <div style="background:var(--panel);border:1.5px solid var(--line);border-radius:10px;padding:18px 24px;margin-bottom:30px;display:flex;align-items:center;gap:24px;">
+    <div style="font-size:32px;font-weight:900;color:var(--muted);letter-spacing:-1px;flex-shrink:0;">~1.8×</div>
+    <div style="width:1px;height:40px;background:var(--line);flex-shrink:0;"></div>
+    <div style="font-size:10px;font-weight:500;color:var(--muted);line-height:1.75;">OMDA is converting 40 cents of every new revenue dollar into profit — a credible starting point, but well below HNGE's 73 cents. The gap in incremental efficiency is ~1.8×. The more consequential difference is the absolute scale: HNGE generated $119.5M of non-GAAP operating income in FY2025 against OMDA's $6.5M of Adj. EBITDA — placing OMDA approximately 3–4 years behind on profitability scale at current growth rates.</div>
+  </div>
+</div>
+
+<!-- 07 FCF -->
+<div class="section-wrap">
+  <div class="section-label"><span class="section-num">07</span> Free Cash Flow History &amp; Balance Sheet</div>
+  <div style="background:var(--panel);border:1.5px solid var(--line);border-radius:10px;padding:28px;margin-bottom:30px;">
+    <div style="font-size:8.5px;font-weight:800;letter-spacing:.16em;color:var(--muted);text-transform:uppercase;margin-bottom:18px;">Annual FCF ($M) — negative bars outlined</div>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;">
+      <div style="font-size:9.5px;font-weight:700;color:var(--muted);width:36px;flex-shrink:0;">2023</div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:4px;">
+        <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:7.5px;font-weight:800;color:var(--omda);width:36px;flex-shrink:0;text-transform:uppercase;">OMDA</span><div class="fcf-bar on" style="width:28%">$(49.7)M · (40%) margin</div></div>
+        <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:7.5px;font-weight:800;color:var(--hnge);width:36px;flex-shrink:0;text-transform:uppercase;">HNGE</span><div class="fcf-bar hn" style="width:38%">$(68.5)M · (23%) margin</div></div>
+      </div>
+    </div>
+    <div style="height:1px;background:var(--line);margin:12px 0;"></div>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;">
+      <div style="font-size:9.5px;font-weight:700;color:var(--muted);width:36px;flex-shrink:0;">2024</div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:4px;">
+        <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:7.5px;font-weight:800;color:var(--omda);width:36px;flex-shrink:0;text-transform:uppercase;">OMDA</span><div class="fcf-bar on" style="width:21%">$(38.0)M · (22%) margin</div></div>
+        <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:7.5px;font-weight:800;color:var(--hnge);width:36px;flex-shrink:0;text-transform:uppercase;">HNGE</span><div class="fcf-bar hp" style="width:25%">+$45.2M · +12% margin</div></div>
+      </div>
+    </div>
+    <div style="height:1px;background:var(--line);margin:12px 0;"></div>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="font-size:9.5px;font-weight:700;color:var(--muted);width:36px;flex-shrink:0;">2025</div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:4px;">
+        <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:7.5px;font-weight:800;color:var(--omda);width:36px;flex-shrink:0;text-transform:uppercase;">OMDA</span><div class="fcf-bar op" style="width:8%">+$12.4M · +4.8%</div></div>
+        <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:7.5px;font-weight:800;color:var(--hnge);width:36px;flex-shrink:0;text-transform:uppercase;">HNGE</span><div class="fcf-bar hp" style="width:100%">+$179.6M · +31% margin · Rule of 40 = 81</div></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:24px;">
+      <div style="background:var(--omda-lt);border:1.5px solid rgba(196,79,35,.16);border-radius:8px;padding:16px;">
+        <div style="font-size:8.5px;font-weight:800;letter-spacing:.14em;color:var(--omda);text-transform:uppercase;margin-bottom:8px;">OMDA Balance Sheet — YE 2025</div>
+        <div style="font-size:22px;font-weight:800;color:var(--omda);">$222.0M</div>
+        <div style="font-size:10.5px;font-weight:500;color:var(--muted);margin-top:5px;">Cash. Zero debt — MidCap facility fully repaid via IPO proceeds. IPO raised ~$161M net.</div>
+      </div>
+      <div style="background:var(--hnge-lt);border:1.5px solid rgba(0,61,72,.16);border-radius:8px;padding:16px;">
+        <div style="font-size:8.5px;font-weight:800;letter-spacing:.14em;color:var(--hnge);text-transform:uppercase;margin-bottom:8px;">HNGE Balance Sheet — YE 2025</div>
+        <div style="font-size:22px;font-weight:800;color:var(--hnge);">$478.8M</div>
+        <div style="font-size:10.5px;font-weight:500;color:var(--muted);margin-top:5px;">Cash + marketable securities. Zero debt. $250M buyback authorized Nov 2025; $65M deployed Q4 2025.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- KEY INSIGHT + PREMIUM / RE-RATING (after FCF) -->
+<div class="section-wrap">
+  <div style="background:var(--panel);border:1.5px solid var(--line);border-radius:8px;padding:16px 22px;margin-bottom:14px;">
+    <div style="font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--text);margin-bottom:8px;">Key Insight — The EV/FCF Inversion</div>
+    <div style="font-size:10px;font-weight:500;color:var(--muted);line-height:1.75;">Despite OMDA's lower EV/Revenue multiple (2.2× vs. 4.9×), <strong style="color:var(--text)">OMDA is more expensive than HNGE on a cash-flow basis</strong> — 46× EV/FCF vs. 16.0×. Each dollar of OMDA revenue converts to far less cash, making each revenue dollar worth less in intrinsic value terms. The revenue multiple discount reflects lower cash conversion, not cheapness.</div>
+  </div>
+  <div class="double-panel" style="margin-bottom:0">
+    <div class="dpanel ot"><div class="dpanel-title" style="color:var(--omda)">OMDA's Re-Rating Path</div><div class="dpanel-body">FY2025 was OMDA's first FCF-positive (+$12.4M) and first Adj. EBITDA-positive (+$6.5M) year. Revenue growth of 53% matched HNGE's pace. GLP-1 care leadership (150K+ members) is a strategic differentiator. Re-rating requires FCF margins of 10–15%+, services margin expansion, and sustained 20%+ growth — a 2027–2028 horizon.</div></div>
+    <div class="dpanel ht"><div class="dpanel-title" style="color:var(--hnge)">Why HNGE Commands a Premium</div><div class="dpanel-body">51% revenue growth + 80% GAAP gross margin + 31% FCF margin simultaneously — a rare combination at $588M scale. Non-GAAP op. income of $119.5M. NDR of 116%. $250M buyback signals confidence in intrinsic value. Rule of 40 of 81 — top decile globally.</div></div>
+  </div>
+</div>
+
+<!-- 08 RULE OF 40 -->
+<div class="section-wrap">
+  <div class="section-label"><span class="section-num">08</span> Rule of 40 — Revenue Growth % + FCF Margin %</div>
+  <div style="font-size:10px;font-weight:500;color:var(--muted);line-height:1.75;margin-bottom:20px;">Score = Revenue Growth Rate + FCF Margin. ≥40 = best-in-class. ≥60 = elite tier. HNGE self-reported a score of <strong style="color:var(--hnge)">81 in FY2025</strong>, placing it in the top decile of all public software companies globally. OMDA crossed 40 for the first time in FY2025 with a score of <strong style="color:var(--pos)">58</strong>. At guided ~22% revenue growth with limited FCF expansion, OMDA's FY2026 score is estimated at ~27 — re-entering the Growth Investment Phase as growth decelerates faster than cash conversion improves.</div>
+  <div class="ro40-grid">
+    <div class="ro40-card" style="border-top:3px solid var(--omda)">
+      <div style="font-size:8.5px;font-weight:800;letter-spacing:.16em;color:var(--omda);text-transform:uppercase;margin-bottom:16px;">OMDA — Omada Health</div>
+      <div class="ro40-entry"><div class="ro40-left"><div class="ro40-yr">FY 2022</div><div class="ro40-comp" style="color:var(--neg)">—% growth + (~83%) FCF burn⁵</div></div><div class="ro40-score" style="color:var(--neg)">N/M</div></div>
+      <div class="ro40-entry"><div class="ro40-left"><div class="ro40-yr">FY 2023</div><div class="ro40-comp" style="color:var(--neg)">+38% growth + (~40%) FCF margin⁴</div></div><div class="ro40-score" style="color:var(--neg)">(2)</div></div>
+      <div class="ro40-entry"><div class="ro40-left"><div class="ro40-yr">FY 2024</div><div class="ro40-comp">+38% growth + (22%) FCF margin</div></div><div class="ro40-score" style="color:var(--gold)">16</div></div>
+      <div class="ro40-entry" style="background:var(--omda-lt);border-radius:6px;margin:0 -24px;padding:12px 24px;">
+        <div class="ro40-left"><div class="ro40-yr" style="color:var(--omda);font-weight:800;">FY 2025 ★</div><div class="ro40-comp">+53% growth + +4.8% FCF margin</div><div style="font-size:8.5px;font-weight:600;color:var(--omda);margin-top:3px;">First year crossing 40 threshold</div></div>
+        <div class="ro40-score" style="color:var(--pos)">58</div>
+      </div>
+      <div class="ro40-entry" style="border-bottom:none;">
+        <div class="ro40-left"><div class="ro40-yr" style="color:var(--neg)">2026E ⚠</div><div class="ro40-comp">~+22% growth + ~5% FCF margin (est.)</div><div style="font-size:8.5px;font-weight:600;color:var(--neg);margin-top:3px;">Likely exits elite tier — growth decelerates faster than FCF expands</div></div>
+        <div class="ro40-score" style="color:var(--neg)">~27</div>
+      </div>
+    </div>
+    <div class="ro40-card" style="border-top:3px solid var(--hnge)">
+      <div style="font-size:8.5px;font-weight:800;letter-spacing:.16em;color:var(--hnge);text-transform:uppercase;margin-bottom:16px;">HNGE — Hinge Health</div>
+      <div class="ro40-entry"><div class="ro40-left"><div class="ro40-yr">FY 2023</div><div class="ro40-comp">+51% growth + (23%) FCF margin</div></div><div class="ro40-score" style="color:var(--gold)">28</div></div>
+      <div class="ro40-entry"><div class="ro40-left"><div class="ro40-yr">FY 2024</div><div class="ro40-comp">+33% growth + +12% FCF margin</div></div><div class="ro40-score" style="color:var(--pos)">45</div></div>
+      <div class="ro40-entry" style="background:var(--hnge-lt);border-radius:6px;margin:0 -24px;padding:12px 24px;">
+        <div class="ro40-left"><div class="ro40-yr" style="color:var(--hnge);font-weight:800;">FY 2025 ★</div><div class="ro40-comp">+51% growth + +31% FCF margin</div><div style="font-size:8.5px;font-weight:600;color:var(--hnge);margin-top:3px;">Company self-reported · Q4 2025 earnings</div></div>
+        <div class="ro40-score" style="color:var(--hnge);font-size:62px;">81</div>
+      </div>
+      <div class="ro40-entry" style="border-bottom:none;"><div class="ro40-left"><div class="ro40-yr" style="color:var(--gold)">2026E</div><div class="ro40-comp">~+25% growth + ~30%+ FCF margin (est.)</div></div><div class="ro40-score" style="color:var(--gold)">~47</div></div>
+    </div>
+  </div>
+  <div style="background:var(--panel);border:1.5px solid var(--line);border-radius:10px;padding:16px 20px;margin-bottom:30px;display:grid;grid-template-columns:repeat(4,1fr);">
+    <div style="text-align:center;padding:12px;"><div style="font-size:30px;font-weight:900;color:var(--neg);">&lt; 0</div><div style="font-size:8.5px;font-weight:700;color:var(--muted);margin-top:5px;">Distressed / Pre-Scale</div></div>
+    <div style="text-align:center;padding:12px;border-left:1px solid var(--line);"><div style="font-size:30px;font-weight:900;color:var(--gold);">0 – 40</div><div style="font-size:8.5px;font-weight:700;color:var(--muted);margin-top:5px;">Growth Investment Phase</div></div>
+    <div style="text-align:center;padding:12px;border-left:1px solid var(--line);"><div style="font-size:30px;font-weight:900;color:var(--pos);">40 – 60</div><div style="font-size:8.5px;font-weight:700;color:var(--muted);margin-top:5px;">Best-in-Class</div></div>
+    <div style="text-align:center;padding:12px;border-left:1px solid var(--line);"><div style="font-size:30px;font-weight:900;color:var(--hnge);">60+</div><div style="font-size:8.5px;font-weight:700;color:var(--muted);margin-top:5px;">Elite Tier</div></div>
+  </div>
+</div>
+
+<!-- 09 EV MULTIPLES -->
+<div class="section-wrap">
+  <div class="section-label"><span class="section-num">09</span> Enterprise Value &amp; Trading Multiples — Late March 2026 Prices</div>
+  <div class="ev-grid">
+    <div class="ev-hdr">
+      <div class="ev-co"><div class="ev-ticker" style="color:var(--omda)">OMDA</div><div class="ev-ev" style="color:var(--omda)">~$567M EV</div><div class="ev-meta">~58.4M shares × ~$13.50/sh ≈ $789M mkt cap &nbsp;·&nbsp; Less $222M cash &nbsp;·&nbsp; Zero debt</div></div>
+      <div class="ev-co"><div class="ev-ticker" style="color:var(--hnge)">HNGE</div><div class="ev-ev" style="color:var(--hnge)">~$2.88B EV</div><div class="ev-meta">~82M shares × ~$41/sh ≈ $3.36B mkt cap &nbsp;·&nbsp; Less $478.8M net cash &nbsp;·&nbsp; Zero debt</div></div>
+    </div>
+    <table class="dt">
+      <thead><tr><th>Multiple</th><th>OMDA FY24</th><th>OMDA FY25</th><th>OMDA 2026E</th><th>HNGE FY24</th><th>HNGE FY25</th><th>HNGE 2026E</th></tr></thead>
+      <tbody>
+        <tr><td>EV / Revenue (trailing)</td><td class="dim">3.3x</td><td>2.2x</td><td class="gld">1.8x</td><td class="dim">7.4x</td><td>4.9x</td><td class="gld">3.9x</td></tr>
+        <tr><td>EV / Gross Profit</td><td class="dim">5.5x</td><td>3.3x</td><td class="gld">~2.5x</td><td class="dim">9.6x</td><td>6.2x</td><td class="gld">~4.9x</td></tr>
+        <tr><td>EV / Non-GAAP Op. Income</td><td class="na">N/M</td><td class="na">N/M</td><td class="na">N/M</td><td class="na">N/M</td><td>24.1x</td><td class="gld">~19x</td></tr>
+        <tr><td>EV / Adj. EBITDA</td><td class="na">N/M</td><td class="neg b">~87x</td><td class="gld">~52x</td><td class="na">N/M</td><td>23.1x</td><td class="gld">~19x</td></tr>
+        <tr><td>EV / FCF</td><td class="na">N/M</td><td class="neg b">46x</td><td class="gld">~35x</td><td class="dim">64x</td><td class="pos b">16.0x</td><td class="gld">~13x</td></tr>
+        <tr><td>Revenue Growth</td><td class="dim">+38%</td><td class="pos">+53%</td><td class="gld">+22%</td><td class="dim">+33%</td><td class="pos">+51%</td><td class="gld">+25%</td></tr>
+        <tr><td>Rule of 40 (FCF-based)</td><td>16</td><td class="pos b">58</td><td class="neg b">~27E ⚠</td><td>45</td><td class="pos b">81</td><td class="gld">~47E</td></tr>
+        <tr><td>Incr. Margin (¢/$rev)</td><td class="na">—</td><td class="neg b">~40¢</td><td class="na">—</td><td class="na">—</td><td class="pos b">~74¢</td><td class="na">—</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 10 OVERHANG & TRADING DYNAMICS -->
+<div class="section-wrap">
+  <div class="section-label"><span class="section-num">10</span> Overhang, Float &amp; Trading Dynamics — Since IPO</div>
+
+  <!-- Share structure table -->
+  <div style="background:var(--panel);border:1.5px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:20px;">
+    <table class="dt">
+      <thead>
+        <tr>
+          <th style="text-align:left">Share Structure</th>
+          <th style="color:#fff;background:var(--omda)">OMDA</th>
+          <th style="color:#fff;background:var(--hnge)">HNGE</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="s-row"><td colspan="3" style="color:var(--muted)">IPO mechanics</td></tr>
+        <tr><td style="color:var(--muted);font-size:11px;font-weight:600;padding-left:16px">IPO date</td><td>June 5, 2025</td><td>May 22, 2025</td></tr>
+        <tr><td style="color:var(--muted);font-size:11px;font-weight:600;padding-left:16px">IPO price</td><td>$19.00/sh</td><td>$32.00/sh</td></tr>
+        <tr><td style="color:var(--muted);font-size:11px;font-weight:600;padding-left:16px">Shares sold at IPO</td><td>7.9M (all primary)</td><td>13.7M (8.5M primary + 5.1M secondary)</td></tr>
+        <tr><td style="color:var(--muted);font-size:11px;font-weight:600;padding-left:16px">Gross proceeds</td><td>~$150M</td><td>~$437M</td></tr>
+        <tr><td style="color:var(--muted);font-size:11px;font-weight:600;padding-left:16px">Day 1 close</td><td class="pos">$23.00 (+21%)</td><td class="pos">$37.56 (+17%)</td></tr>
+        <tr class="s-row"><td colspan="3" style="color:var(--muted)">Share count &amp; float</td></tr>
+        <tr><td style="color:var(--muted);font-size:11px;font-weight:600;padding-left:16px">FDSO (late-Mar 2026)</td><td>~58.4M</td><td>~82M</td></tr>
+        <tr><td style="color:var(--muted);font-size:11px;font-weight:600;padding-left:16px">Float at IPO</td><td>~7.9M (~14% of FDSO)</td><td>~13.7M (~17% of FDSO)</td></tr>
+        <tr><td style="color:var(--muted);font-size:11px;font-weight:600;padding-left:16px">Institutional ownership</td><td class="dim">~45% (est.)</td><td class="pos">~45%</td></tr>
+        <tr class="s-row"><td colspan="3" style="color:var(--muted)">Lockup structure</td></tr>
+        <tr><td style="color:var(--muted);font-size:11px;font-weight:600;padding-left:16px">Lockup type</td><td>Single-tranche, 180 days</td><td>Staggered two-tranche</td></tr>
+        <tr><td style="color:var(--muted);font-size:11px;font-weight:600;padding-left:16px">Early release</td><td class="na">None</td><td>Aug 19, 2025 — ~1.66M employee shares (90-day, condition-triggered)</td></tr>
+        <tr><td style="color:var(--muted);font-size:11px;font-weight:600;padding-left:16px">Full lockup expiry</td><td>Dec 3, 2025</td><td>Nov 18, 2025</td></tr>
+        <tr><td style="color:var(--muted);font-size:11px;font-weight:600;padding-left:16px">Shares subject to lockup</td><td>~50M+ (~99.9% of pre-IPO shares)</td><td>~78M+ (~99.9% of pre-IPO shares)</td></tr>
+        <tr class="s-row"><td colspan="3" style="color:var(--muted)">Price performance since IPO</td></tr>
+        <tr><td style="color:var(--muted);font-size:11px;font-weight:600;padding-left:16px">All-time high</td><td>$28.40 (Jun 6, 2025 — day 2)</td><td>$62.18 (Aug 18, 2025)</td></tr>
+        <tr><td style="color:var(--muted);font-size:11px;font-weight:600;padding-left:16px">All-time low</td><td class="neg">$10.28 (Feb 11, 2026)</td><td class="neg">$30.08 (Feb 9, 2026)</td></tr>
+        <tr><td style="color:var(--muted);font-size:11px;font-weight:600;padding-left:16px">Current vs. IPO price</td><td class="neg">~$13.50 (−29% vs. IPO)</td><td class="pos">~$39 (+22% vs. IPO)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Price milestone timeline -->
+  <div style="background:var(--panel);border:1.5px solid var(--line);border-radius:10px;padding:24px 28px;margin-bottom:20px;">
+    <div style="font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Price milestones since IPO — confirmed data points</div>
+    <div style="font-size:11px;font-weight:500;color:var(--muted);margin-bottom:20px;line-height:1.7;">Each dot represents a confirmed price. Lines between dots are illustrative only — intermediate price action is not shown. Both series indexed to IPO price = 100.</div>
+
+    <div style="position:relative;height:260px;margin-bottom:8px;">
+      <canvas id="milestoneChart"></canvas>
+    </div>
+
+    <!-- Legend -->
+    <div style="display:flex;gap:24px;margin-top:10px;flex-wrap:wrap;">
+      <span style="display:flex;align-items:center;gap:7px;font-size:10px;font-weight:700;color:var(--omda)">
+        <span style="width:18px;height:2.5px;background:var(--omda);display:inline-block;border-radius:2px"></span>OMDA (IPO Jun 5)
+      </span>
+      <span style="display:flex;align-items:center;gap:7px;font-size:10px;font-weight:700;color:var(--hnge)">
+        <span style="width:18px;height:2.5px;background:var(--hnge);display:inline-block;border-radius:2px"></span>HNGE (IPO May 22)
+      </span>
+      <span style="display:flex;align-items:center;gap:7px;font-size:10px;font-weight:500;color:var(--muted)">
+        <span style="width:10px;height:10px;background:rgba(196,79,35,0.18);border:1.5px solid var(--omda);border-radius:50%;display:inline-block"></span>OMDA lockup event
+      </span>
+      <span style="display:flex;align-items:center;gap:7px;font-size:10px;font-weight:500;color:var(--muted)">
+        <span style="width:10px;height:10px;background:rgba(0,61,72,0.18);border:1.5px solid var(--hnge);border-radius:50%;display:inline-block"></span>HNGE lockup event
+      </span>
+    </div>
+    <div style="font-size:9.5px;font-weight:500;color:var(--muted);margin-top:14px;padding-top:10px;border-top:0.5px solid var(--line);line-height:1.75;">
+      Sources: IPO prices from SEC 424B4 filings. Day 1 closes from CNBC/Reuters. ATH/ATL and Dec 2 close from TradingView/StockInvest. Lockup dates from SEC 8-K filings. Current price Apr 6, 2026 from Investing.com.
+    </div>
+  </div>
+
+  <!-- Lockup/buyback narrative -->
+  <div style="background:var(--panel);border:1.5px solid var(--line);border-radius:10px;padding:20px 24px;margin-bottom:30px;">
+    <div style="font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--text);margin-bottom:14px;">Key Observations — Overhang &amp; Trading Dynamics</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--omda);text-transform:uppercase;letter-spacing:.08em;margin-bottom:7px;">OMDA — Lockup Expiry Into a Weaker Market</div>
+        <div style="font-size:11px;font-weight:500;color:var(--muted);line-height:1.8;">OMDA's single-tranche 180-day lockup expired December 3, 2025, releasing ~50M+ shares — roughly 6× the IPO float. Unlike HNGE, OMDA had no buyback program or capital return mechanism to offset the supply shock, and no equivalent institutional signal of management confidence in intrinsic value. The stock had already declined from its $28.40 ATH by December and continued lower through Q4 2025 earnings (March 5, 2026), reaching an ATL of $10.28. OMDA's lower FCF generation means it cannot execute a defensive buyback — which itself illustrates the circular relationship between FCF scale, capital return optionality, and valuation support.</div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;color:var(--hnge);text-transform:uppercase;letter-spacing:.08em;margin-bottom:7px;">HNGE — The Buyback as Overhang Defense</div>
+        <div style="font-size:11px;font-weight:500;color:var(--muted);line-height:1.8;">HNGE's full lockup expiry (November 18, 2025) released ~78M shares — roughly 5.7× the IPO float — into the public market. The $250M buyback was announced 8 days prior (November 10). This sequencing was almost certainly deliberate: the buyback provided a price floor signal and a visible demand offset as the lockup supply hit. The stock was at ~$41 at expiry and held near that level through December, suggesting the buyback effectively absorbed meaningful selling pressure. The staggered two-tranche structure (1.66M shares August 19, remainder November 18) also limited the initial dilution shock, giving the stock time to re-rate on fundamental performance before the full float opened.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 11 TRAJECTORY COMPARISON -->
+<div class="section-wrap">
+  <div class="section-label"><span class="section-num">11</span> Trajectory Comparison — OMDA Today vs. HNGE at Equivalent Stage</div>
+
+  <div style="background:var(--panel);border:1.5px solid var(--line);border-radius:10px;padding:20px 24px;margin-bottom:20px;">
+    <div style="font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">How to read this section</div>
+    <div style="font-size:11px;font-weight:500;color:var(--muted);line-height:1.8;">Both companies are indexed to <strong style="color:var(--text)">Year 0 = first FCF-positive year</strong> — HNGE's Year 0 is FY2024, OMDA's is FY2025. Calendar years are removed; maturation stage is the axis. OMDA's FY2026E aligns against HNGE's FY2025 actual; OMDA's FY2027E aligns against HNGE's FY2026E. One critical observation: <strong style="color:var(--text)">OMDA's Year 0 revenue growth (+53%) materially exceeds HNGE's Year 0 (+33%)</strong> — OMDA is scaling faster but converting less to profit. The gap to close is one of quality, not pace.</div>
+  </div>
+
+  <div style="background:var(--panel);border:1.5px solid var(--line);border-radius:10px;padding:24px;margin-bottom:20px;">
+    <div style="display:flex;align-items:center;gap:20px;margin-bottom:18px;flex-wrap:wrap;">
+      <div style="font-size:8.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);">Absolute financials ($M) · Year 0 = first FCF+ year</div>
+      <div style="display:flex;gap:16px;margin-left:auto;">
+        <span style="display:flex;align-items:center;gap:6px;font-size:9px;font-weight:700;color:var(--hnge)"><span style="width:12px;height:12px;background:#003D48;border-radius:2px;display:inline-block"></span>HNGE actuals</span>
+        <span style="display:flex;align-items:center;gap:6px;font-size:9px;font-weight:700;color:var(--omda)"><span style="width:12px;height:12px;background:#C44F23;border-radius:2px;display:inline-block"></span>OMDA actuals / guided</span>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+      <div>
+        <div style="font-size:8.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Revenue &amp; Gross Profit ($M)</div>
+        <div style="position:relative;height:240px;"><canvas id="s10RevChart"></canvas></div>
+      </div>
+      <div>
+        <div style="font-size:8.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Adj. EBITDA &amp; Free Cash Flow ($M)</div>
+        <div style="position:relative;height:240px;"><canvas id="s10ProfChart"></canvas></div>
+      </div>
+    </div>
+    <div style="font-size:10px;font-weight:500;color:var(--muted);margin-top:14px;padding-top:12px;border-top:0.5px solid var(--line);line-height:1.8;">
+      At their respective Year 0 inflection points, OMDA is approximately <strong style="color:var(--text)">one year behind HNGE on FCF generation</strong> and <strong style="color:var(--text)">roughly 3–4 years behind on absolute profitability scale</strong>. HNGE's Year +1 step-change — from $45M to $180M FCF and from breakeven to $125M Adj. EBITDA in a single year — is the benchmark OMDA's guided FY2026 trajectory does not yet match. Hover over any bar to see the corresponding calendar year for each company.
+    </div>
+  </div>
+
+  <div style="background:var(--panel);border:1.5px solid var(--line);border-radius:10px;padding:18px 22px;margin-bottom:30px;">
+    <div style="font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--text);margin-bottom:12px;">Key Observations</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+      <div>
+        <div style="font-size:9px;font-weight:700;color:var(--pos);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Where OMDA is running ahead</div>
+        <div style="font-size:10px;font-weight:500;color:var(--muted);line-height:1.75;">Revenue at Year 0: $260M vs. HNGE's $390M — OMDA is smaller in absolute scale but growing faster (+53% vs. +33%). Gross profit trajectory is improving; services-only margin is already near parity with HNGE. Rule of 40 at Year 0 of 58 exceeds HNGE's 45, driven by superior revenue growth.</div>
+      </div>
+      <div>
+        <div style="font-size:9px;font-weight:700;color:var(--neg);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">The Year +1 gap is the critical watch point</div>
+        <div style="font-size:10px;font-weight:500;color:var(--muted);line-height:1.75;">HNGE went from $45M to $180M FCF in a single year — a 4× step-change. HNGE's Adj. EBITDA went from $(20M) to +$125M in the same move. OMDA's guided Year +1 implies FCF of ~$16M and Adj. EBITDA of ~$11M — no equivalent inflection. The absolute dollar gap in cash generation is where the valuation discount lives.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Milestone chart — Section 10
+window.addEventListener('load', function(){
+  if(!window.Chart) return;
+  (function(){
+    const d = (y,m,day) => Math.round((new Date(y,m-1,day) - new Date(2025,4,22))/86400000);
+
+    // Confirmed price data points only — indexed to IPO=100
+    // HNGE IPO price $32, OMDA IPO price $19
+    const HNGE_pts = [
+      { x: d(2025,5,22), y: 100,  note: 'IPO · $32.00' },
+      { x: d(2025,5,22), y: 117,  note: 'Day 1 close · $37.56' },
+      { x: d(2025,8,18), y: 194,  note: 'ATH · $62.18' },
+      { x: d(2025,12,2), y: 145,  note: 'Dec 2 close · $46.56' },
+      { x: d(2026,2,9),  y: 94,   note: 'ATL · $30.08' },
+      { x: d(2026,4,6),  y: 122,  note: 'Current · ~$39' },
+    ];
+
+    const OMDA_pts = [
+      { x: d(2025,6,5),  y: 100,  note: 'IPO · $19.00' },
+      { x: d(2025,6,5),  y: 121,  note: 'Day 1 close · $23.00' },
+      { x: d(2025,6,6),  y: 149,  note: 'ATH · $28.40' },
+      { x: d(2025,10,28),y: 141,  note: 'Oct 28 close · $26.78' },
+      { x: d(2026,2,11), y: 54,   note: 'ATL · $10.28' },
+      { x: d(2026,4,6),  y: 71,   note: 'Current · ~$13.50' },
+    ];
+
+    // Vertical event annotations (x positions)
+    const evts = [
+      { x: d(2025,8,19),  label: 'HNGE early\nlockup (1.66M sh)', color:'rgba(0,61,72,0.28)' },
+      { x: d(2025,11,10), label: 'HNGE buyback\n$250M announced',  color:'rgba(0,61,72,0.5)'  },
+      { x: d(2025,11,18), label: 'HNGE full\nlockup expiry',       color:'rgba(0,61,72,0.75)' },
+      { x: d(2025,12,3),  label: 'OMDA full\nlockup expiry',       color:'rgba(196,79,35,0.75)'},
+    ];
+
+    const cvs = document.getElementById('milestoneChart');
+    if(!cvs) return;
+
+    // Vertical line plugin
+    const vlinePlugin = {
+      id: 'vlines',
+      afterDraw(chart) {
+        const {ctx, scales: {x, y}} = chart;
+        evts.forEach(ev => {
+          const xPx = x.getPixelForValue(ev.x);
+          ctx.save();
+          ctx.beginPath();
+          ctx.moveTo(xPx, y.top);
+          ctx.lineTo(xPx, y.bottom);
+          ctx.strokeStyle = ev.color;
+          ctx.lineWidth = 1.5;
+          ctx.setLineDash([4, 3]);
+          ctx.stroke();
+          // Small label at top
+          ctx.setLineDash([]);
+          ctx.font = '8px Montserrat, sans-serif';
+          ctx.fillStyle = ev.color.replace(/[\d.]+\)$/, '0.9)');
+          ctx.textAlign = 'center';
+          const lines = ev.label.split('\n');
+          lines.forEach((ln, i) => ctx.fillText(ln, xPx, y.top + 10 + i * 9));
+          ctx.restore();
+        });
+      }
+    };
+
+    new Chart(cvs, {
+      type: 'line',
+      plugins: [vlinePlugin],
+      data: {
+        datasets: [
+          {
+            label: 'HNGE',
+            data: HNGE_pts.map(p => ({x: p.x, y: p.y})),
+            borderColor: '#003D48', backgroundColor: 'rgba(0,61,72,0.08)',
+            borderWidth: 2.5, pointRadius: 6, pointHoverRadius: 8,
+            pointBackgroundColor: '#003D48', pointBorderColor: '#fff', pointBorderWidth: 1.5,
+            tension: 0.25, fill: false, spanGaps: false,
+          },
+          {
+            label: 'OMDA',
+            data: OMDA_pts.map(p => ({x: p.x, y: p.y})),
+            borderColor: '#C44F23', backgroundColor: 'rgba(196,79,35,0.08)',
+            borderWidth: 2.5, pointRadius: 6, pointHoverRadius: 8,
+            pointBackgroundColor: '#C44F23', pointBorderColor: '#fff', pointBorderWidth: 1.5,
+            tension: 0.25, fill: false, spanGaps: false,
+          },
+          {
+            label: 'IPO = 100',
+            data: [{x:-5,y:100},{x:d(2026,4,10),y:100}],
+            borderColor: 'rgba(90,107,114,0.22)', borderWidth: 1,
+            borderDash: [5,4], pointRadius: 0, fill: false,
+          }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false, animation: false,
+        interaction: { mode: 'nearest', intersect: true },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              title: items => {
+                const x = items[0].parsed.x;
+                const dt = new Date(2025,4,22);
+                dt.setDate(dt.getDate() + x);
+                return dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+              },
+              label: item => {
+                if(item.datasetIndex === 2) return null;
+                const ticker = item.datasetIndex === 0 ? 'HNGE' : 'OMDA';
+                const ipoP  = item.datasetIndex === 0 ? 32 : 19;
+                const pts   = item.datasetIndex === 0 ? HNGE_pts : OMDA_pts;
+                const match = pts.find(p => p.x === item.parsed.x && Math.abs(p.y - item.parsed.y) < 0.5);
+                const note  = match ? match.note : '';
+                return ` ${ticker}: indexed ${item.parsed.y.toFixed(0)} · ${note}`;
+              }
+            },
+            filter: item => item.datasetIndex !== 2
+          }
+        },
+        scales: {
+          x: {
+            type: 'linear',
+            min: -10,
+            max: d(2026,4,12),
+            ticks: {
+              font: {size:9}, color:'#5A6B72',
+              stepSize: 30,
+              callback: v => {
+                const lbl = {0:"May '25",30:"Jun",61:"Jul",92:"Aug",122:"Sep",153:"Oct",183:"Nov",214:"Dec",245:"Jan '26",276:"Feb",304:"Mar",335:"Apr '26"};
+                return lbl[v] || '';
+              },
+              maxTicksLimit: 12,
+            },
+            grid: { color:'rgba(0,61,72,0.04)' }
+          },
+          y: {
+            min: 40, max: 215,
+            ticks: { font:{size:9}, color:'#5A6B72', stepSize:25 },
+            grid: { color:'rgba(0,61,72,0.06)' },
+            title: { display:true, text:'Indexed to IPO = 100', font:{size:9}, color:'#5A6B72' }
+          }
+        }
+      }
+    });
+  })();
+});
+</script>
+
+<script>
+window.addEventListener('load', function(){
+  if(!window.Chart) return;
+  (function(){
+  const XLBLS = ['Year \u22121','Year 0 \u2605','Year +1','Year +2E'];
+
+  // Calendar year lookups for tooltip — [Yr-1, Yr0, Yr+1, Yr+2E]
+  const HNGE_YRS = ['FY2023','FY2024','FY2025','FY2026E'];
+  const OMDA_YRS = ['FY2024','FY2025','FY2026E','FY2027E'];
+
+  const HNGE_REV = [292.7, 390.4, 587.9, 737];
+  const HNGE_GP  = [194.2, 299.9, 468.2, 590];
+  const HNGE_EBI = [-50.5, -20.2, 124.6, 154];
+  const HNGE_FCF = [-68.5,  45.2, 179.6, 220];
+  const OMDA_REV = [122.8, 260.2, 317,   null];
+  const OMDA_GP  = [70.0,  170.9, 209,   null];
+  const OMDA_EBI = [null,    6.5,  11,   null];
+  const OMDA_FCF = [-49.7,  12.4,  16,   null];
+
+  // Revenue + Adj. EBITDA = prominent (full opacity)
+  // Gross Profit + FCF = supporting (reduced opacity)
+  const HNGE_P  = '#003D48';                 // primary — Revenue, EBITDA
+  const OMDA_P  = '#C44F23';
+  const HNGE_S  = 'rgba(0,61,72,0.42)';      // secondary — GP, FCF
+  const OMDA_S  = 'rgba(196,79,35,0.42)';
+  const HNGE_PE = 'rgba(0,61,72,0.35)';      // guided version of primary
+  const OMDA_PE = 'rgba(196,79,35,0.35)';
+  const HNGE_SE = 'rgba(0,61,72,0.18)';      // guided version of secondary
+  const OMDA_SE = 'rgba(196,79,35,0.18)';
+
+  // Title shows relative year; each series line shows metric + calendar year + value
+  const makeTip = (isHnge) => ({
+    callbacks: {
+      title: ctx => ctx[0].label,
+      label: ctx => {
+        const i = ctx.dataIndex;
+        const cal = isHnge ? HNGE_YRS[i] : OMDA_YRS[i];
+        const val = ctx.parsed.y;
+        if(val === null || val === undefined) return null;
+        return ' ' + ctx.dataset.label + ' (' + cal + '): $' + val.toFixed(0) + 'M';
+      }
+    }
+  });
+
+  const baseOpts = (yMin, yMax) => ({
+    responsive: true, maintainAspectRatio: false, animation: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { ticks: { font: { size: 9 }, color: '#5A6B72' }, grid: { color: 'rgba(0,61,72,0.05)' } },
+      y: { min: yMin, max: yMax,
+           ticks: { font: { size: 9 }, color: '#5A6B72', callback: v => '$' + v + 'M' },
+           grid: { color: 'rgba(0,61,72,0.05)' } }
+    }
+  });
+
+  // Revenue & Gross Profit chart
+  // Revenue = prominent, GP = supporting
+  new Chart(document.getElementById('s10RevChart'), {
+    type: 'bar',
+    data: {
+      labels: XLBLS,
+      datasets: [
+        { label: 'OMDA Revenue',  data: OMDA_REV, backgroundColor: [OMDA_P,OMDA_P,OMDA_PE,OMDA_PE], borderRadius: 3, barPercentage: 0.38, categoryPercentage: 0.95 },
+        { label: 'HNGE Revenue',  data: HNGE_REV, backgroundColor: [HNGE_P,HNGE_P,HNGE_P,HNGE_PE], borderRadius: 3, barPercentage: 0.38, categoryPercentage: 0.95 },
+        { label: 'OMDA Gross Profit', data: OMDA_GP, backgroundColor: [OMDA_S,OMDA_S,OMDA_SE,OMDA_SE], borderRadius: 3, barPercentage: 0.38, categoryPercentage: 0.95 },
+        { label: 'HNGE Gross Profit', data: HNGE_GP, backgroundColor: [HNGE_S,HNGE_S,HNGE_S,HNGE_SE], borderRadius: 3, barPercentage: 0.38, categoryPercentage: 0.95 },
+      ]
+    },
+    options: {
+      ...baseOpts(0, 800),
+      plugins: { legend: { display: false },
+        tooltip: { callbacks: {
+          title: ctx => ctx[0].label,
+          label: ctx => {
+            const i = ctx.dataIndex;
+            const isOmda = ctx.datasetIndex % 2 === 0;
+            const cal = isOmda ? OMDA_YRS[i] : HNGE_YRS[i];
+            const val = ctx.parsed.y;
+            if(val === null || val === undefined) return null;
+            return ' ' + ctx.dataset.label + ' (' + cal + '): $' + val.toFixed(0) + 'M';
+          }
+        }}
+      }
+    }
+  });
+
+  // Adj. EBITDA & FCF chart
+  // Adj. EBITDA = prominent, FCF = supporting
+  new Chart(document.getElementById('s10ProfChart'), {
+    type: 'bar',
+    data: {
+      labels: XLBLS,
+      datasets: [
+        { label: 'OMDA Adj. EBITDA', data: OMDA_EBI, backgroundColor: [OMDA_P,OMDA_P,OMDA_PE,OMDA_PE], borderRadius: 3, barPercentage: 0.38, categoryPercentage: 0.95 },
+        { label: 'HNGE Adj. EBITDA', data: HNGE_EBI, backgroundColor: [HNGE_P,HNGE_P,HNGE_P,HNGE_PE], borderRadius: 3, barPercentage: 0.38, categoryPercentage: 0.95 },
+        { label: 'OMDA FCF',         data: OMDA_FCF, backgroundColor: [OMDA_S,OMDA_S,OMDA_SE,OMDA_SE], borderRadius: 3, barPercentage: 0.38, categoryPercentage: 0.95 },
+        { label: 'HNGE FCF',         data: HNGE_FCF, backgroundColor: [HNGE_S,HNGE_S,HNGE_S,HNGE_SE], borderRadius: 3, barPercentage: 0.38, categoryPercentage: 0.95 },
+      ]
+    },
+    options: {
+      ...baseOpts(-90, 240),
+      plugins: { legend: { display: false },
+        tooltip: { callbacks: {
+          title: ctx => ctx[0].label,
+          label: ctx => {
+            const i = ctx.dataIndex;
+            const isOmda = ctx.datasetIndex % 2 === 0;
+            const cal = isOmda ? OMDA_YRS[i] : HNGE_YRS[i];
+            const val = ctx.parsed.y;
+            if(val === null || val === undefined) return null;
+            return ' ' + ctx.dataset.label + ' (' + cal + '): $' + val.toFixed(0) + 'M';
+          }
+        }}
+      }
+    }
+  });
+  })();
+});
+</script>
+
+
+<div class="fn">
+  <strong>Sources:</strong> HNGE: S-1 (Mar 10, 2025) · Q4 &amp; FY2025 Earnings Release &amp; SEC Exhibit 99.1 (Feb 10, 2026) · NYSE: HNGE &nbsp;|&nbsp; OMDA: 424B4 Final Prospectus (Jun 5, 2025) · FY2025 Earnings Release (Mar 5, 2026) · NASDAQ: OMDA. All gross margins GAAP throughout.<br>
+  <strong>¹</strong> Guidance midpoints: HNGE $732–742M revenue, $151–156M non-GAAP op. income. OMDA $312–322M revenue, $7–15M Adj. EBITDA.<br>
+  <strong>²</strong> HNGE FY2025 GAAP net loss ($528M) dominated by ~$643M SBC at IPO (one-time non-cash). Non-GAAP op. income of $119.5M is the operative measure.<br>
+  <strong>³</strong> HNGE Adj. EBITDA estimated as Non-GAAP Op. Income + D&amp;A ($5.1M FY2025).<br>
+  <strong>⁴</strong> OMDA FY2023 FCF per 424B4 prospectus: OCF $(49.7M) less capex ~$7.5M. &nbsp; <strong>⁵</strong> OMDA FY2022 FCF not separately disclosed; Rule of 40 N/M.<br>
+  <strong>EV note:</strong> Late-March 2026 prices. HNGE: 82M shares × ~$41/sh = ~$3.36B mkt cap; less $478.8M cash = ~$2.88B EV. OMDA: 58.4M shares × ~$13.50/sh = ~$789M mkt cap; less $222M cash = ~$567M EV. Not investment advice.
+</div>
+
+</div><!-- /tab-analysis -->
+
+
+<!-- ══════════════════════════════════════════════
+     TAB 2 — MULTIPLE EXPANSION MODELER
+══════════════════════════════════════════════ -->
+<div id="tab-modeler" class="tab-panel">
+<div class="mod-wrap">
+
+  <div class="mod-intro">
+    <h2>Multiple Expansion Modeler</h2>
+    <p>Set your base case inputs for each year — including an implied share price per year to model a re-rating path. The center scenario card reflects your exact inputs; bear and bull flanking scenarios auto-generate as calibrated offsets. Implied dollar values update live below each slider. FCF = Adj. EBITDA + SBC add-back − Capex, where SBC compounds YoY from the $13M FY2025 base and Capex is fixed at 5% of implied OpEx. Cash builds from $222M YE2025 base. EV is calculated independently per year.</p>
+  </div>
+
+  <!-- INPUT PANEL -->
+  <div class="ip-section">
+    <div class="ip-section-label">Base case inputs — your modeled scenario</div>
+    <div class="ip-years" id="ipYears"></div>
+  </div>
+
+  <!-- SCENARIO CARDS -->
+  <div class="scenarios-grid" id="scenarioCards"></div>
+
+  <!-- MULTIPLES TABLE -->
+  <div class="mult-section-label">Multiples vs. HNGE 2026E benchmark</div>
+  <div style="background:var(--panel);border:1.5px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:24px;">
+    <table class="mt" id="multTable"></table>
+  </div>
+
+  <!-- COMMENTARY -->
+  <div id="modCommentary" style="margin-bottom:24px;"></div>
+
+  <!-- HNGE HISTORICAL OVERLAY CHART -->
+  <div class="mult-section-label" style="margin-top:8px;">OMDA trajectory vs. HNGE at equivalent stage</div>
+  <div style="background:var(--panel);border:1.5px solid var(--line);border-radius:10px;padding:22px 24px 18px;margin-bottom:24px;">
+    <div style="font-size:10px;font-weight:500;color:var(--muted);line-height:1.7;margin-bottom:18px;">HNGE lines are fixed historical actuals indexed to their first FCF+ year (FY2024 = Year 0). OMDA's Year 0 = FY2025 actual; Year +1 and +2 update live from your base case inputs. The gap between the lines at each year illustrates what OMDA needs to execute to replicate HNGE's re-rating trajectory.</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+      <div>
+        <div style="font-size:8.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">FCF Margin — % of Revenue</div>
+        <div style="display:flex;gap:16px;margin-bottom:8px;flex-wrap:wrap;">
+          <span style="display:flex;align-items:center;gap:5px;font-size:9px;font-weight:600;color:var(--hnge)"><span style="width:18px;height:2.5px;background:#003D48;display:inline-block;border-radius:2px"></span>HNGE actuals</span>
+          <span style="display:flex;align-items:center;gap:5px;font-size:9px;font-weight:600;color:var(--omda)"><span style="width:10px;height:2px;background:#C44F23;display:inline-block;border-radius:2px"></span><span style="width:4px"></span><span style="width:10px;height:2px;background:#C44F23;display:inline-block;border-radius:2px"></span>OMDA base</span>
+          <span style="display:flex;align-items:center;gap:5px;font-size:9px;font-weight:600;color:#888780"><span style="width:10px;height:1.5px;background:#888780;display:inline-block;border-radius:2px"></span><span style="width:4px"></span><span style="width:10px;height:1.5px;background:#888780;display:inline-block;border-radius:2px"></span>Bear/Bull</span>
+        </div>
+        <div style="position:relative;height:200px;"><canvas id="fcfChart"></canvas></div>
+      </div>
+      <div>
+        <div style="font-size:8.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Rule of 40</div>
+        <div style="display:flex;gap:16px;margin-bottom:8px;flex-wrap:wrap;">
+          <span style="display:flex;align-items:center;gap:5px;font-size:9px;font-weight:600;color:var(--hnge)"><span style="width:18px;height:2.5px;background:#003D48;display:inline-block;border-radius:2px"></span>HNGE actuals</span>
+          <span style="display:flex;align-items:center;gap:5px;font-size:9px;font-weight:600;color:var(--omda)"><span style="width:10px;height:2px;background:#C44F23;display:inline-block;border-radius:2px"></span><span style="width:4px"></span><span style="width:10px;height:2px;background:#C44F23;display:inline-block;border-radius:2px"></span>OMDA base</span>
+          <span style="display:flex;align-items:center;gap:5px;font-size:9px;font-weight:600;color:#888780"><span style="width:10px;height:1.5px;background:#888780;display:inline-block;border-radius:2px"></span><span style="width:4px"></span><span style="width:10px;height:1.5px;background:#888780;display:inline-block;border-radius:2px"></span>Bear/Bull</span>
+        </div>
+        <div style="position:relative;height:200px;"><canvas id="ro40Chart"></canvas></div>
+      </div>
+    </div>
+    <div style="font-size:9px;font-weight:500;color:var(--muted);margin-top:12px;padding-top:10px;border-top:0.5px solid var(--line);">Year 0 = first FCF-positive year &nbsp;·&nbsp; HNGE: FY2023 (Yr −1) · FY2024 (Yr 0) · FY2025 (Yr +1) · FY2026E (Yr +2) &nbsp;·&nbsp; OMDA: FY2024 (Yr −1) · FY2025 (Yr 0) · FY2026E (Yr +1) · base case FY2027E (Yr +2). Bear/Bull bands show scenario range.</div>
+  </div>
+
+  <div class="mod-foot" id="modFoot"></div>
+
+</div>
+</div><!-- /tab-modeler -->
+
+
+<!-- ══════════ TAB SWITCHING ══════════ -->
+<script>
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+
+<!-- ══════════ CHART.JS ══════════ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+
+<!-- ══════════ MODELER LOGIC ══════════ -->
+<script>
+(function(){
+  const YEARS=[2026,2027,2028];
+  const BASE_REV=260.2, BASE_CASH=222, SHARES=58.4;
+  const BASE_SBC=13.0;
+  const CAPEX_OF_OPEX=0.05;
+  const HNGE={ev:2500,rev:737,gp:590,ebitda:154,fcf:220,gm:80,ebitdaM:20.9,fcfM:29.8,revG:25,ro40:47};
+
+  // ── HNGE HISTORICAL DATA (indexed: Yr-1=FY23, Yr0=FY24, Yr+1=FY25, Yr+2E=FY26E) ──
+  const HNGE_FCF  = [-23, 12, 31, 30];
+  const HNGE_RO40 = [28,  45, 81, 47];
+  const OMDA_FCF_ACT  = [-22, 4.8];   // FY2024 (Yr-1), FY2025 (Yr0) actuals
+  const OMDA_RO40_ACT = [16,  58];    // FY2024, FY2025 actuals
+  const XLABELS = ['Year \u22121','Year 0 \u2605','Year +1','Year +2'];
+
+  let fcfChartInst=null, ro40ChartInst=null;
+
+  function buildCharts(){
+    const fcfCtx=document.getElementById('fcfChart');
+    const ro40Ctx=document.getElementById('ro40Chart');
+    if(!fcfCtx||!ro40Ctx||!window.Chart) return;
+
+    const baseOpts=(yMin,yMax,refLine)=>({
+      responsive:true, maintainAspectRatio:false,
+      animation:false,
+      plugins:{
+        legend:{display:false},
+        ...(refLine!==null ? {annotation:{annotations:{ref:{
+          type:'line',yMin:refLine,yMax:refLine,
+          borderColor:'rgba(0,61,72,0.2)',borderWidth:1,borderDash:[4,4]
+        }}}} : {})
+      },
+      scales:{
+        x:{ticks:{font:{size:9},color:'#5A6B72'},grid:{color:'rgba(0,61,72,0.06)'}},
+        y:{min:yMin,max:yMax,
+           ticks:{font:{size:9},color:'#5A6B72'},
+           grid:{color:'rgba(0,61,72,0.06)'}}
+      }
+    });
+
+    const mkDatasets=()=>([
+      {label:'HNGE',data:[],borderColor:'#003D48',backgroundColor:'rgba(0,61,72,0.07)',
+       borderWidth:2.5,pointRadius:4,pointBackgroundColor:'#003D48',tension:0.3},
+      {label:'OMDA Base',data:[],borderColor:'#C44F23',backgroundColor:'rgba(196,79,35,0.05)',
+       borderWidth:2,borderDash:[6,3],pointRadius:4,pointBackgroundColor:'#C44F23',tension:0.3},
+      {label:'Bear',data:[],borderColor:'#888780',borderWidth:1,borderDash:[3,3],
+       pointRadius:2,pointBackgroundColor:'#888780',tension:0.3,fill:false},
+      {label:'Bull',data:[],borderColor:'#888780',borderWidth:1,borderDash:[3,3],
+       pointRadius:2,pointBackgroundColor:'#888780',tension:0.3,fill:'-1',
+       backgroundColor:'rgba(136,135,128,0.08)'},
+    ]);
+
+    fcfChartInst=new Chart(fcfCtx,{type:'line',
+      data:{labels:XLABELS,datasets:mkDatasets()},
+      options:baseOpts(-30,45,null)});
+
+    ro40ChartInst=new Chart(ro40Ctx,{type:'line',
+      data:{labels:XLABELS,datasets:mkDatasets()},
+      options:baseOpts(-10,95,40)});
+  }
+
+  function renderCharts(projs){
+    if(!fcfChartInst||!ro40ChartInst) return;
+    // yr+1 = 2026, yr+2 = 2027
+    const p=projs;
+    const fcfPct=d=>r1(d.fcf/d.rev*100);
+    const ro40v =d=>r0(d.ro40);
+
+    const bFCF =[...OMDA_FCF_ACT, fcfPct(p.base[2026]), fcfPct(p.base[2027])];
+    const bnFCF=[...OMDA_FCF_ACT, fcfPct(p.bear[2026]), fcfPct(p.bear[2027])];
+    const buFCF=[...OMDA_FCF_ACT, fcfPct(p.bull[2026]), fcfPct(p.bull[2027])];
+
+    const bRO  =[...OMDA_RO40_ACT, ro40v(p.base[2026]), ro40v(p.base[2027])];
+    const bnRO =[...OMDA_RO40_ACT, ro40v(p.bear[2026]), ro40v(p.bear[2027])];
+    const buRO =[...OMDA_RO40_ACT, ro40v(p.bull[2026]), ro40v(p.bull[2027])];
+
+    fcfChartInst.data.datasets[0].data=HNGE_FCF;
+    fcfChartInst.data.datasets[1].data=bFCF;
+    fcfChartInst.data.datasets[2].data=bnFCF;
+    fcfChartInst.data.datasets[3].data=buFCF;
+    fcfChartInst.update('none');
+
+    ro40ChartInst.data.datasets[0].data=HNGE_RO40;
+    ro40ChartInst.data.datasets[1].data=bRO;
+    ro40ChartInst.data.datasets[2].data=bnRO;
+    ro40ChartInst.data.datasets[3].data=buRO;
+    ro40ChartInst.update('none');
+  }
+
+  const FIELDS=[
+    {key:'rg', label:'Revenue growth',           min:5,  max:50,  step:1,   def:[22,22,20], fmt:v=>(v>=0?'+':'')+v+'%', refKey:'rev'},
+    {key:'gm', label:'GAAP gross margin',         min:55, max:85,  step:0.5, def:[66,68,71], fmt:v=>v+'%',               refKey:'gp'},
+    {key:'em', label:'Adj. EBITDA margin',        min:-10,max:35,  step:0.5, def:[4,8,13],   fmt:v=>v+'%',               refKey:'ebitda'},
+    {key:'sb', label:'SBC growth (YoY)',          min:0,  max:100, step:2,   def:[15,12,10], fmt:v=>'+'+v+'%',           refKey:'sbc'},
+    {key:'br', label:'Share repurchases (ann.)',  min:0,  max:100, step:5,   def:[0,0,0],    fmt:v=>'$'+v+'M',           refKey:'buyback'},
+    {key:'sp', label:'Avg. implied share price',  min:8,  max:80,  step:0.5, def:[16,22,32], fmt:v=>'$'+parseFloat(v).toFixed(2), refKey:'ev'},
+  ];
+
+  const BEAR_OFF={rg:-5, gm:-2.5, em:-3, sb:3,  br:0, sp:-6};
+  const BULL_OFF={rg:4,  gm:3,    em:4,  sb:-3, br:0, sp:10};
+
+  function clamp(v,mn,mx){return Math.max(mn,Math.min(mx,v));}
+  function r1(v){return Math.round(v*10)/10;}
+  function r0(v){return Math.round(v);}
+  function fmtM(v){return (v<0?'-':'')+'$'+Math.abs(r0(v))+'M';}
+  function fmtB(v){return '$'+r1(v/1000).toFixed(2)+'B';}
+  function fmtMx(v){if(!isFinite(v)||v>999||v<0)return'N/M';return r1(v).toFixed(1)+'x';}
+  function fmtP(v){return r1(v).toFixed(1)+'%';}
+
+  function project(inputs){
+    let prevRev=BASE_REV, prevSBC=BASE_SBC, cash=BASE_CASH, shares=SHARES;
+    const yrs={};
+    YEARS.forEach(yr=>{
+      const inp=inputs[yr];
+      const rev      = prevRev*(1+inp.rg/100);
+      const gp       = rev*inp.gm/100;
+      const ebitda   = rev*inp.em/100;
+      const opex     = gp - ebitda;
+      const capex    = Math.max(opex,0)*CAPEX_OF_OPEX;
+      const sbc      = prevSBC*(1+inp.sb/100);
+      const fcf      = ebitda + sbc - capex;
+      const buyback  = inp.br || 0;
+      cash += fcf - buyback;
+      const nc = Math.max(cash, 0);
+      // Diluted shares: +SBC issuance, -buyback shares retired
+      const sbcShares = inp.sp > 0 ? sbc / inp.sp : 0;
+      const bbShares  = inp.sp > 0 ? buyback / inp.sp : 0;
+      shares = Math.max(shares + sbcShares - bbShares, 1);
+      const ev = inp.sp*shares - nc;
+      yrs[yr]={rev,gp,ebitda,opex,capex,sbc,fcf,buyback,cash:nc,ev,sp:inp.sp,shares,
+               gm:inp.gm,em:inp.em,rg:inp.rg,sb:inp.sb,br:buyback,
+               ro40:inp.rg+(fcf/rev*100)};
+      prevRev=rev; prevSBC=sbc;
+    });
+    return yrs;
+  }
+
+  function projectRefs(inputs){
+    let prevRev=BASE_REV, prevSBC=BASE_SBC, cash=BASE_CASH, shares=SHARES;
+    const refs={};
+    YEARS.forEach((yr,i)=>{
+      const inp=inputs[yr];
+      const rev      = prevRev*(1+inp.rg/100);
+      const gp       = rev*inp.gm/100;
+      const ebitda   = rev*inp.em/100;
+      const opex     = gp - ebitda;
+      const capex    = Math.max(opex,0)*CAPEX_OF_OPEX;
+      const sbc      = prevSBC*(1+inp.sb/100);
+      const fcf      = ebitda + sbc - capex;
+      const buyback  = inp.br || 0;
+      cash += fcf - buyback;
+      const nc = Math.max(cash, 0);
+      const sbcShares = inp.sp > 0 ? sbc / inp.sp : 0;
+      const bbShares  = inp.sp > 0 ? buyback / inp.sp : 0;
+      shares = Math.max(shares + sbcShares - bbShares, 1);
+      const ev = inp.sp*shares - nc;
+      refs[i]={rev,gp,ebitda,sbc,fcf,ev,buyback,shares};
+      prevRev=rev; prevSBC=sbc;
+    });
+    return refs;
+  }
+
+  const SCENARIOS=[
+    {id:'bear',name:'Bear',color:'#888780',tagBg:'rgba(136,135,128,.12)',tagColor:'#5F5E5A',tag:'downside'},
+    {id:'base',name:'Base',color:'#C44F23',tagBg:'rgba(196,79,35,.12)',tagColor:'#C44F23',tag:'your model'},
+    {id:'bull',name:'Bull',color:'#003D48',tagBg:'rgba(0,61,72,.1)',tagColor:'#003D48',tag:'upside'},
+  ];
+
+  function getBase(){
+    const d={};
+    YEARS.forEach((yr,i)=>{
+      d[yr]={};
+      FIELDS.forEach(f=>{ d[yr][f.key]=parseFloat(document.getElementById('sl-'+f.key+'-'+i).value)||0; });
+    });
+    return d;
+  }
+
+  function applyOff(base,off){
+    const d={};
+    YEARS.forEach((yr,i)=>{
+      d[yr]={};
+      FIELDS.forEach(f=>{ d[yr][f.key]=clamp(base[yr][f.key]+(off[f.key]||0),f.min,f.max); });
+    });
+    return d;
+  }
+
+  function buildSliders(){
+    const wrap=document.getElementById('ipYears');
+    let html='';
+    YEARS.forEach((yr,i)=>{
+      html+=`<div><div class="ip-yr-head">${yr}</div>`;
+      FIELDS.forEach(f=>{
+        html+=`<div class="sl-row">
+          <div class="sl-top"><span class="sl-lbl">${f.label}</span><span class="sl-val" id="sv-${f.key}-${i}">${f.fmt(f.def[i])}</span></div>
+          <input type="range" min="${f.min}" max="${f.max}" step="${f.step}" value="${f.def[i]}" id="sl-${f.key}-${i}">
+          <div class="sl-ref" id="sr-${f.key}-${i}"></div>
+        </div>`;
+      });
+      html+=`<div class="sl-row" style="margin-top:4px;padding-top:10px;border-top:0.5px solid var(--line);">
+        <div class="sl-top">
+          <span class="sl-fcf-lbl">Free Cash Flow</span>
+          <span class="sl-fcf-val" id="sr-fcf-${i}">—</span>
+        </div>
+        <div class="sl-ref" id="sr-fcf-sub-${i}"></div>
+      </div>`;
+      html+=`<div class="sl-row" style="margin-top:2px;">
+        <div class="sl-top">
+          <span class="sl-fcf-lbl" style="color:var(--muted)">EV / diluted share</span>
+          <span class="sl-fcf-val" id="sr-evsh-${i}" style="color:var(--muted)">—</span>
+        </div>
+        <div class="sl-ref" id="sr-evsh-sub-${i}"></div>
+      </div>`;
+      html+='</div>';
+    });
+    wrap.innerHTML=html;
+    YEARS.forEach((_,i)=>{
+      FIELDS.forEach(f=>{
+        document.getElementById('sl-'+f.key+'-'+i).addEventListener('input',function(){
+          document.getElementById('sv-'+f.key+'-'+i).textContent=f.fmt(parseFloat(this.value));
+          recalc();
+        });
+      });
+    });
+  }
+
+  function updateRefs(base){
+    const refs=projectRefs(base);
+    const LABELS={rev:'Revenue',gp:'Gross profit',ebitda:'Adj. EBITDA',sbc:'SBC',ev:'Enterprise value',buyback:'Buybacks (cash used)'};
+    YEARS.forEach((yr,i)=>{
+      const r=refs[i];
+      FIELDS.forEach(f=>{
+        const el=document.getElementById('sr-'+f.key+'-'+i);
+        if(!el||!f.refKey) return;
+        const val=r[f.refKey];
+        el.style.color='var(--muted)';
+        el.style.fontWeight='';
+        el.textContent=`\u2192 ${LABELS[f.refKey]}: ${f.refKey==='ev'?fmtB(val):f.refKey==='buyback'?fmtM(val):fmtM(val)}`;
+      });
+      const fcfEl=document.getElementById('sr-fcf-'+i);
+      const fcfSub=document.getElementById('sr-fcf-sub-'+i);
+      if(fcfEl){
+        const fcf=r.fcf, pct=r.rev>0?fcf/r.rev*100:0;
+        fcfEl.style.color='var(--muted)';
+        fcfEl.textContent=fmtM(fcf);
+        if(fcfSub){
+          fcfSub.style.color='var(--muted)';
+          fcfSub.style.fontWeight='';
+          fcfSub.textContent=`\u2192 FCF margin: ${fmtP(pct)}`;
+        }
+      }
+      const evshEl=document.getElementById('sr-evsh-'+i);
+      const evshSub=document.getElementById('sr-evsh-sub-'+i);
+      if(evshEl){
+        const evPerSh=r.ev/r.shares;
+        evshEl.style.color='var(--muted)';
+        evshEl.textContent=isFinite(evPerSh)&&evPerSh>0?'$'+r1(evPerSh).toFixed(2):'—';
+        if(evshSub){
+          evshSub.style.color='var(--muted)';
+          evshSub.style.fontWeight='';
+          evshSub.textContent=isFinite(evPerSh)&&evPerSh>0
+            ? `\u2192 ${r1(r.shares).toFixed(1)}M diluted shares \u00b7 ${fmtB(r.ev)} EV`
+            : '';
+        }
+      }
+    });
+  }
+
+  function renderCards(projs){
+    const wrap=document.getElementById('scenarioCards');
+    let html='';
+    SCENARIOS.forEach(s=>{
+      const isCenter=s.id==='base';
+      html+=`<div class="s-card${isCenter?' center-card':''}">`;
+      html+=`<div class="s-card-hdr"><span class="s-dot" style="background:${s.color}"></span><span class="s-name">${s.name}</span><span class="s-tag" style="background:${s.tagBg};color:${s.tagColor}">${s.tag}</span></div>`;
+      html+=`<div class="s-body">`;
+      YEARS.forEach((yr,yi)=>{
+        if(yi>0) html+=`<div class="s-divider"></div>`;
+        const d=projs[s.id][yr];
+        const ro=r0(d.ro40);
+        const roColor=ro>=40?'var(--pos)':ro>=20?'var(--gold)':'var(--neg)';
+        // P&L block
+        html+=`<div class="s-yr-block"><div class="s-yr-lbl">${yr}</div><div class="s-metrics">`;
+        html+=`<div class="s-metric-row"><span class="s-metric-lbl">Revenue</span><span class="s-metric-val">${fmtM(d.rev)}</span></div>`;
+        html+=`<div class="s-metric-row"><span class="s-metric-lbl">Gross profit</span><span class="s-metric-val">${fmtM(d.gp)} (${fmtP(d.gm)})</span></div>`;
+        html+=`<div class="s-metric-row"><span class="s-metric-lbl">Adj. EBITDA</span><span class="s-metric-val" style="color:${d.ebitda>=0?'var(--pos)':'var(--neg)'}">${fmtM(d.ebitda)} (${fmtP(d.em)})</span></div>`;
+        html+=`<div class="s-metric-row"><span class="s-metric-lbl">SBC add-back</span><span class="s-metric-val">+${fmtM(d.sbc)}</span></div>`;
+        html+=`<div class="s-metric-row"><span class="s-metric-lbl">Capex (5% of OpEx)</span><span class="s-metric-val">(${fmtM(d.capex)})</span></div>`;
+        html+=`<div class="s-metric-row"><span class="s-metric-lbl">FCF</span><span class="s-metric-val" style="color:${d.fcf>=0?'var(--pos)':'var(--neg)'}">${fmtM(d.fcf)} (${fmtP(d.fcf/d.rev*100)})</span></div>`;
+        html+=`<div class="s-metric-row"><span class="s-metric-lbl">FCF / diluted share</span><span class="s-metric-val" style="color:${d.fcf>=0?'var(--pos)':'var(--neg)'}">$${r1(d.fcf/d.shares).toFixed(2)}</span></div>`;
+        html+=`<div class="s-metric-row"><span class="s-metric-lbl">Share repurchases</span><span class="s-metric-val" style="color:${d.buyback>0?'var(--omda)':'var(--muted)'}">${d.buyback>0?'('+fmtM(d.buyback)+')':'—'}</span></div>`;
+        html+=`<div class="s-metric-row"><span class="s-metric-lbl">Net cash (cumul.)</span><span class="s-metric-val">${fmtM(d.cash)}</span></div>`;
+        // Valuation block
+        html+=`<div class="s-metric-row" style="margin-top:4px;padding-top:4px;border-top:0.5px dashed var(--line);border-bottom:none"><span class="s-metric-lbl">Diluted shares</span><span class="s-metric-val">${r1(d.shares).toFixed(1)}M</span></div>`;
+        html+=`<div class="s-metric-row"><span class="s-metric-lbl">Share price</span><span class="s-metric-val">$${d.sp.toFixed(2)}</span></div>`;
+        html+=`<div class="s-metric-row"><span class="s-metric-lbl">Enterprise value</span><span class="s-metric-val">${fmtB(d.ev)}</span></div>`;
+        html+=`<div class="s-metric-row"><span class="s-metric-lbl">EV / Revenue</span><span class="s-metric-val">${fmtMx(d.ev/d.rev)}</span></div>`;
+        html+=`<div class="s-metric-row"><span class="s-metric-lbl">EV / FCF</span><span class="s-metric-val">${fmtMx(d.ev/d.fcf)}</span></div>`;
+        html+=`<div class="s-metric-row"><span class="s-metric-lbl">Rule of 40</span><span class="s-metric-val" style="color:${roColor}">${ro}</span></div>`;
+        html+=`</div></div>`;
+      });
+      html+=`</div></div>`;
+    });
+    wrap.innerHTML=html;
+  }
+
+  function renderCommentary(projs){
+    const el=document.getElementById('modCommentary');
+    if(!el) return;
+
+    function yearBucket(d){
+      const ro=r0(d.ro40), pct=d.fcf/d.rev*100, evRev=d.ev/d.rev;
+      if(ro>=60)                              return 'ro40-elite';
+      if(ro>=40)                              return 'ro40-best';
+      if(pct>=25)                             return 'fcf-parity';
+      if(pct>=10)                             return 'fcf-rerating';
+      if(d.em>=20)                            return 'ebitda-parity';
+      if(d.em>=10)                            return 'ebitda-credible';
+      if(isFinite(evRev)&&evRev>0&&evRev>=2.2) return 'evrev-rerate';
+      return 'no-threshold';
+    }
+
+    function yearNote(d, repeated){
+      if(repeated) return `No material change in multiple expansion path — continued execution on the prior year's trajectory.`;
+      const ro=r0(d.ro40), pct=d.fcf/d.rev*100, evRev=d.ev/d.rev;
+      if(ro>=60)   return `Rule of 40 reaches ${ro} — elite tier. Institutional quality-growth funds expand the eligible buyer base; EV/Revenue multiples above 5× become defensible.`;
+      if(ro>=40)   return `Rule of 40 of ${ro} crosses into best-in-class territory. The market transitions from a pure revenue-growth framework toward earnings quality, supporting multiple stability as growth decelerates.`;
+      if(pct>=25)  return `FCF margin of ${fmtP(pct)} approaches HNGE's ~30% level. EV/FCF multiples begin converging — the primary mechanism driving revenue multiple re-rating.`;
+      if(pct>=10)  return `FCF margin crosses 10% (${fmtP(pct)}). FCF-anchored investors shift from "early inflection" to "durable cash generation" framing — a prerequisite for meaningful EV/Revenue multiple expansion.`;
+      if(d.em>=20) return `Adj. EBITDA margin of ${fmtP(d.em)} reaches HNGE's guided ~21% level. Full operating leverage parity — the revenue multiple gap should narrow if FCF conversion follows.`;
+      if(d.em>=10) return `Adj. EBITDA margin of ${fmtP(d.em)} crosses 10% — the point at which management guidance is treated as a durable margin floor by the buy side rather than a first-year inflection.`;
+      if(isFinite(evRev)&&evRev>0&&evRev>=2.2) return `EV/Revenue of ${fmtMx(evRev)} implies a meaningful re-rating from today's 2.2×. Requires FCF and margin assumptions to be demonstrably sustained over multiple quarters.`;
+      return `EV/Revenue ${fmtMx(evRev)}, EV/FCF ${fmtMx(d.ev/d.fcf)}, Rule of 40 ${ro}. No major valuation thresholds crossed — continued execution before a re-rating becomes visible.`;
+    }
+
+    let html=`<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;">`;
+    SCENARIOS.forEach(s=>{
+      const p=projs[s.id];
+      let prevBucket=null;
+      html+=`<div style="background:var(--panel);border:1.5px solid var(--line);border-top:3px solid ${s.color};border-radius:10px;padding:18px 20px;">`;
+      html+=`<div style="font-size:8.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:${s.color};margin-bottom:14px;">${s.name} — ${s.tag}</div>`;
+      YEARS.forEach((yr,i)=>{
+        const bucket=yearBucket(p[yr]);
+        const repeated=(i>0 && bucket===prevBucket);
+        const note=yearNote(p[yr], repeated);
+        if(i>0) html+=`<div style="height:0.5px;background:var(--line);margin:10px 0;"></div>`;
+        html+=`<div style="display:flex;gap:10px;align-items:flex-start;">
+          <div style="flex-shrink:0;width:16px;height:16px;border-radius:50%;border:1.5px solid ${s.color};opacity:${repeated?'0.35':'1'};display:flex;align-items:center;justify-content:center;margin-top:1px;">
+            <span style="font-size:7px;font-weight:800;color:${s.color};">'${yr.toString().slice(2)}</span>
+          </div>
+          <div style="font-size:10px;font-weight:500;line-height:1.7;color:${repeated?'var(--muted2)':'var(--muted)'};font-style:${repeated?'italic':'normal'};">${note}</div>
+        </div>`;
+        prevBucket=bucket;
+      });
+      html+=`</div>`;
+    });
+    html+=`</div>`;
+    el.innerHTML=html;
+  }
+
+  function renderTable(projs){
+    const ROWS=[
+      {label:'EV / Revenue',      fn:p=>fmtMx(p.ev/p.rev),          hv:fmtMx(HNGE.ev/HNGE.rev),    good:p=>p.ev/p.rev<HNGE.ev/HNGE.rev},
+      {label:'EV / Gross Profit', fn:p=>fmtMx(p.ev/p.gp),           hv:fmtMx(HNGE.ev/HNGE.gp),     good:p=>p.ev/p.gp<HNGE.ev/HNGE.gp},
+      {label:'EV / Adj. EBITDA',  fn:p=>fmtMx(p.ev/p.ebitda),       hv:fmtMx(HNGE.ev/HNGE.ebitda), good:p=>p.ev/p.ebitda<HNGE.ev/HNGE.ebitda},
+      {label:'EV / FCF',          fn:p=>fmtMx(p.ev/p.fcf),          hv:fmtMx(HNGE.ev/HNGE.fcf),    good:p=>p.ev/p.fcf<HNGE.ev/HNGE.fcf},
+      {sep:true,label:'Efficiency'},
+      {label:'Revenue growth',    fn:p=>'+'+r0(p.rg)+'%',           hv:'+'+HNGE.revG+'%',           good:p=>p.rg>=HNGE.revG},
+      {label:'GAAP gross margin', fn:p=>fmtP(p.gm),                  hv:fmtP(HNGE.gm),               good:p=>p.gm>=HNGE.gm},
+      {label:'Adj. EBITDA margin',fn:p=>fmtP(p.em),                  hv:fmtP(HNGE.ebitdaM),          good:p=>p.em>=HNGE.ebitdaM},
+      {label:'FCF margin',        fn:p=>fmtP(p.fcf/p.rev*100),       hv:fmtP(HNGE.fcfM),             good:p=>p.fcf/p.rev*100>=HNGE.fcfM},
+      {label:'FCF / diluted share',fn:p=>'$'+r1(p.fcf/p.shares).toFixed(2), hv:'$'+r1(HNGE.fcf/82).toFixed(2), good:p=>p.fcf/p.shares>=HNGE.fcf/82},
+      {label:'EV / diluted share', fn:p=>'$'+r1(p.ev/p.shares).toFixed(2),  hv:'$'+r1(HNGE.ev/82).toFixed(2),  good:p=>false},
+      {label:'Rule of 40',        fn:p=>r0(p.ro40).toString(),       hv:HNGE.ro40.toString(),        good:p=>p.ro40>=HNGE.ro40},
+    ];
+    const colCount=1+1+SCENARIOS.length*YEARS.length+(SCENARIOS.length-1);
+    let h=`<thead><tr><th>Metric</th><th class="hnge-c" style="text-align:right">HNGE 2026E</th>`;
+    SCENARIOS.forEach((s,si)=>{
+      YEARS.forEach(yr=>{h+=`<th style="color:#fff;opacity:0.9">${s.name} ${yr}</th>`;});
+      if(si<SCENARIOS.length-1) h+=`<th class="mt-spacer"></th>`;
+    });
+    h+=`</tr></thead><tbody>`;
+    ROWS.forEach(row=>{
+      if(row.sep){h+=`<tr class="grp"><td colspan="${colCount}">${row.label}</td></tr>`;return;}
+      h+=`<tr><td>${row.label}</td><td class="hnge-c">${row.hv}</td>`;
+      SCENARIOS.forEach((s,si)=>{
+        YEARS.forEach(yr=>{
+          const p=projs[s.id][yr];
+          const val=row.fn(p);
+          const cls=val==='N/M'?'dim':row.good&&row.good(p)?'pos':'neg';
+          h+=`<td class="${cls}">${val}</td>`;
+        });
+        if(si<SCENARIOS.length-1) h+=`<td class="mt-spacer"></td>`;
+      });
+      h+=`</tr>`;
+    });
+    h+=`</tbody>`;
+    document.getElementById('multTable').innerHTML=h;
+  }
+
+  function recalc(){
+    const base=getBase();
+    updateRefs(base);
+    const projs={
+      bear: project(applyOff(base,BEAR_OFF)),
+      base: project(base),
+      bull: project(applyOff(base,BULL_OFF)),
+    };
+    renderCards(projs);
+    renderCommentary(projs);
+    renderTable(projs);
+    renderCharts(projs);
+    document.getElementById('modFoot').innerHTML=`<strong>Methodology:</strong> Revenue compounds from $260.2M FY2025 base. SBC compounds YoY from $${BASE_SBC}M FY2025 base. FCF = Adj. EBITDA + SBC \u2212 Capex (fixed at 5% of implied OpEx). Share repurchases reduce net cash and retire shares (buyback \u00f7 share price); they do not affect FCF. Net cash accumulates from $222M YE2025 balance after FCF and buybacks. Diluted shares start at ${SHARES}M, increase by SBC issuance, and decrease by shares retired via repurchase. EV = (diluted shares \u00d7 that year\u2019s implied share price) \u2212 net cash, calculated independently per year. Bear offsets: rev growth \u22125pts, GM \u22122.5pts, EBITDA margin \u22123pts, SBC growth +3pts, share price \u2212$6; buyback unchanged across scenarios. Bull: +4pts, +3pts, +4pts, \u22123pts, +$10. HNGE 2026E fixed: $2.5B EV \u00b7 $737M rev \u00b7 80% GAAP GM \u00b7 ~$154M EBITDA \u00b7 ~$220M FCF. Not investment advice.`;
+  }
+
+  buildSliders();
+  buildCharts();
+  recalc();
+})();
+</script>
+</body>
+</html>
