@@ -1108,91 +1108,318 @@ html, body {
   .footer-note { flex-direction: column; align-items: flex-start; gap: 12px; }
 }
 
+/* ════════════════════════════════════════════════════════════════════
+   CLICKABLE PREVIEWS + MODAL (HNGE & FDE only)
+   ════════════════════════════════════════════════════════════════════ */
+.preview-clickable {
+  position: relative;
+  cursor: pointer;
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+.preview-clickable:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 40px rgba(22,20,15,0.10);
+}
+.preview-hint {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(22,20,15,0.78);
+  color: #FBF8F1;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  padding: 4px 9px;
+  border-radius: 1px;
+  opacity: 0;
+  transform: translateY(-3px);
+  transition: opacity .22s ease, transform .22s ease;
+  pointer-events: none;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.preview-hint::before {
+  content: '↗';
+  font-size: 11px;
+  letter-spacing: 0;
+  line-height: 0.9;
+}
+.preview-clickable:hover .preview-hint {
+  opacity: 1;
+  transform: translateY(0);
+}
+/* FDE has dark background — adjust hint colors for contrast */
+.preview.fde .preview-hint {
+  background: rgba(247, 243, 234, 0.92);
+  color: #0E1A1F;
+}
+
+/* MODAL */
+.doc-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(22, 20, 15, 0.78);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  opacity: 0;
+  transition: opacity .25s ease;
+}
+.doc-modal.open {
+  display: flex;
+  opacity: 1;
+}
+.doc-modal-shell {
+  position: relative;
+  width: 100%;
+  max-width: 1280px;
+  height: 100%;
+  background: var(--paper);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.4);
+  display: flex;
+  flex-direction: column;
+  transform: translateY(8px) scale(0.985);
+  transition: transform .3s cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+.doc-modal.open .doc-modal-shell { transform: none; }
+.doc-modal-bar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 18px;
+  border-bottom: 1px solid var(--line);
+  background: var(--bg-warm);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.doc-modal-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.doc-modal-title::before {
+  content: '';
+  width: 7px; height: 7px;
+  background: var(--burnt);
+  border-radius: 50%;
+  display: inline-block;
+}
+.doc-modal-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.doc-modal-link {
+  color: var(--ink-soft);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: color .15s, border-color .15s;
+  padding-bottom: 1px;
+}
+.doc-modal-link:hover {
+  color: var(--burnt);
+  border-bottom-color: var(--burnt);
+}
+.doc-modal-close {
+  background: none;
+  border: 1px solid var(--line);
+  color: var(--ink-soft);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background .15s, border-color .15s, color .15s;
+  padding: 0;
+  line-height: 1;
+}
+.doc-modal-close:hover {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper);
+}
+.doc-modal-frame {
+  flex: 1 1 auto;
+  width: 100%;
+  border: 0;
+  background: #fff;
+}
+body.modal-open { overflow: hidden; }
+
 /* PRINT */
 @media print {
-  body { background: #fff; }
+  html, body { background: #fff; }
+  body { font-size: 11px; line-height: 1.45; }
   .meta-bar { display: none; }
-  .page { padding: 22px 28px; max-width: 100%; }
+  .doc-modal { display: none !important; }
+  .preview-hint { display: none !important; }
+  .page { padding: 14px 22px 6px; max-width: 100%; background: #fff; }
 
-  /* Tighter section spacing in print */
-  .section { margin-bottom: 36px; }
-  .section-head { padding-bottom: 10px; margin-bottom: 18px; }
-  .masthead { padding: 18px 0 28px; margin-bottom: 32px; }
+  /* ── MASTHEAD ── scale name and tagline to conventional resume sizes */
+  .masthead { padding: 4px 0 12px; margin-bottom: 14px; border-bottom-width: 1px; }
+  .eyebrow { font-size: 7.5px; letter-spacing: 0.2em; margin-bottom: 10px; }
+  .eyebrow::before { width: 22px; }
+  .name { font-size: 34px; line-height: 0.95; letter-spacing: -0.025em; margin-bottom: 7px; }
+  .tagline { font-size: 12px; max-width: 100%; margin-bottom: 10px; line-height: 1.35; }
+  .contact-row { font-size: 9px; }
+  .contact-sep { margin: 0 9px; width: 2px; height: 2px; }
 
-  /* Restore desktop layouts in print regardless of viewport-width media queries */
-  .metrics { grid-template-columns: repeat(4, 1fr); }
-  .metric { border-right: 1px solid var(--line-soft); border-bottom: none; padding: 18px 16px 18px 0; }
+  /* ── SECTION SCAFFOLD ── tighter throughout */
+  .section { margin-bottom: 4px; }
+  .section-head { padding-bottom: 3px; margin-bottom: 5px; gap: 12px; }
+  .section-num { font-size: 8.5px; }
+  .section-title { font-size: 16px; letter-spacing: -0.015em; }
+  .section-kicker { font-size: 8px; letter-spacing: 0.13em; }
+
+  /* ── POSITIONING ── */
+  .positioning { font-size: 11.5px; line-height: 1.5; max-width: 100%; }
+
+  /* ── METRICS ── compact 4-col strip */
+  .metrics { grid-template-columns: repeat(4, 1fr); margin-top: 12px; }
+  .metric { padding: 10px 12px 10px 0; border-right: 1px solid var(--line-soft); border-bottom: none; }
   .metric:last-child { border-right: none; padding-right: 0; }
-  .metric:not(:first-child) { padding-left: 16px; }
-  .metric-value { font-size: 24px; letter-spacing: -0.02em; }
-  .metric-label { font-size: 9px; }
+  .metric:not(:first-child) { padding-left: 12px; }
+  .metric-label { font-size: 7.5px; margin-bottom: 4px; letter-spacing: 0.12em; }
+  .metric-value { font-size: 16px; letter-spacing: -0.02em; line-height: 1; margin-bottom: 3px; }
+  .metric-sub { font-size: 8.5px; line-height: 1.3; }
 
-  .bwc-intro { grid-template-columns: 1fr 280px; gap: 36px; margin-bottom: 18px; page-break-inside: avoid; break-inside: avoid; }
-  .bwc-section-label { margin: 22px 0 12px; }
+  /* ── BUILT WITH CLAUDE ── */
+  .bwc-intro { grid-template-columns: 1fr 240px; gap: 20px; margin-bottom: 10px; page-break-inside: avoid; break-inside: avoid; }
+  .bwc-intro p { font-size: 11px; line-height: 1.5; }
+  .bwc-stat-card { padding: 9px 11px; }
+  .bwc-stat-label { font-size: 7.5px; margin-bottom: 4px; }
+  .bwc-stat-row { font-size: 9.5px; padding: 2.5px 0; }
+  .bwc-section-label { font-size: 8.5px; margin: 12px 0 7px; gap: 10px; letter-spacing: 0.18em; }
+  .bwc-section-label::before { width: 18px; }
+  .bwc-section-label .quiet { font-size: 8px; }
 
-  /* Work cards: tighter padding and shorter previews so two can almost fit per page,
-     and FDE + side projects can share a page */
+  /* ── WORK CARDS ── compact full-width */
   .work-card {
-    grid-template-columns: 320px 1fr;
-    gap: 22px;
-    padding: 18px 22px;
-    margin-bottom: 12px;
+    grid-template-columns: 220px 1fr;
+    gap: 14px;
+    padding: 11px 13px;
+    margin-bottom: 7px;
   }
-  .work-card .preview { min-height: 180px; }
-  .work-card .preview.hnge { min-height: 200px; padding: 14px 16px; gap: 8px; }
-  .work-card .preview.hnge .hnge-tick { font-size: 26px; }
-  .work-card .preview.fde { min-height: 180px; padding: 18px 20px; gap: 10px; }
-  .work-card .preview.fde .fde-headline { font-size: 16px; line-height: 1.18; }
-  .work-content { gap: 10px; }
-  .work-content .proj-title { font-size: 22px; }
-  .work-content .proj-desc { font-size: 12.5px; line-height: 1.5; }
-  .work-content .proj-impact { padding-top: 8px; font-size: 10.5px; }
+  .work-card .preview { min-height: 122px; }
+  .work-card .preview.hnge { min-height: 132px; padding: 9px 11px; gap: 5px; }
+  .work-card .preview.hnge .hnge-tick { font-size: 17px; }
+  .work-card .preview.hnge .hnge-vs { font-size: 8px; }
+  .work-card .preview.hnge .hnge-bar-label { font-size: 7px; width: 44px; letter-spacing: 0.04em; }
+  .work-card .preview.hnge .hnge-bar-track { height: 4px; }
+  .work-card .preview.hnge .hnge-bar-val { font-size: 7px; width: 22px; }
+  .work-card .preview.fde { min-height: 122px; padding: 11px 13px; gap: 7px; }
+  .work-card .preview.fde .fde-eyebrow { font-size: 7px; letter-spacing: 0.16em; }
+  .work-card .preview.fde .fde-headline { font-size: 12px; line-height: 1.18; }
+  .work-card .preview.fde .fde-pill { font-size: 7px; padding: 2px 5px; letter-spacing: 0.04em; }
+  .work-content { gap: 5px; }
+  .work-content .proj-num { font-size: 8.5px; }
+  .work-content .proj-title { font-size: 13.5px; letter-spacing: -0.012em; line-height: 1.18; }
+  .work-content .proj-tag { font-size: 8px; letter-spacing: 0.1em; }
+  .work-content .proj-desc { font-size: 10.5px; line-height: 1.42; }
+  .work-content .proj-impact { padding-top: 5px; font-size: 8.5px; letter-spacing: 0.02em; }
 
-  /* Side projects */
-  .side-projects { grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-  .side-projects .project-card { padding: 14px 16px; gap: 10px; }
-  .side-projects .proj-title { font-size: 17px; }
-  .side-projects .proj-desc { font-size: 11.5px; line-height: 1.45; }
+  /* ── SIDE PROJECTS ── 3-col compact */
+  .side-projects { grid-template-columns: 1fr 1fr 1fr; gap: 7px; }
+  .side-projects .project-card { padding: 9px 11px; gap: 7px; }
+  .side-projects .proj-num { font-size: 8px; }
+  .side-projects .proj-title { font-size: 12.5px; letter-spacing: -0.01em; }
+  .side-projects .proj-tag { font-size: 7.5px; letter-spacing: 0.1em; }
+  .side-projects .proj-desc { font-size: 9.5px; line-height: 1.38; }
+  .side-projects .proj-impact { font-size: 8px; padding-top: 4px; }
 
-  /* Roadmap */
-  .rm-stats { gap: 28px; }
-  .rm-stats > span strong { font-size: 32px; }
-  .rm-phases { grid-template-columns: repeat(6, 1fr); }
-  .rm-phase { border-right: 1px solid var(--line-soft); border-bottom: none; }
-  .rm-phase:last-child { border-right: none; }
-  .rm-phase::after { display: block; }
-  .rm-phase:last-child::after { display: none; }
-  .rm-workstreams { grid-template-columns: 1fr 1fr; }
-  .rm-ws { border-right: 1px solid var(--line-soft); }
-  .rm-ws:nth-child(2n) { border-right: none; }
-  .rm-ws:nth-last-child(-n+2) { border-bottom: none; }
-
-  /* Experience */
-  .exp { grid-template-columns: 170px 1fr; gap: 24px; padding: 18px 0 20px; }
-  .exp-meta { flex-direction: column; gap: 4px; }
-
-  /* Education */
-  .edu-grid { grid-template-columns: 1fr 1fr 1fr; }
-  .edu-item { border-right: 1px solid var(--line-soft); border-bottom: none; padding: 8px 24px 8px 0; }
-  .edu-item:last-child { border-right: none; padding-right: 0; }
-  .edu-item:not(:first-child) { padding-left: 24px; }
-
-  .footer-note { flex-direction: row; }
-
-  /* WildTrek agent pills — 2x2 grid in narrower side-projects context */
-  .side-projects .preview.trek { height: auto; min-height: 100px; }
-  .side-projects .preview.trek .trek-agents { display: grid; grid-template-columns: auto auto; gap: 3px 4px; justify-content: center; }
+  /* WildTrek pills 2x2 */
+  .side-projects .preview.trek { height: auto; min-height: 76px; padding: 6px 8px; gap: 4px; }
+  .side-projects .preview.trek .trek-eyebrow { font-size: 6px; }
+  .side-projects .preview.trek .trek-orch { font-size: 10px; padding: 1px 8px; }
+  .side-projects .preview.trek .trek-orch::after { display: none; }
+  .side-projects .preview.trek .trek-agents { display: grid; grid-template-columns: auto auto; gap: 2px 3px; justify-content: center; }
   .side-projects .preview.trek .trek-agents::before { display: none; }
-  .side-projects .preview.trek .trek-agents span { font-size: 7px; padding: 2px 5px; }
+  .side-projects .preview.trek .trek-agents span { font-size: 6px; padding: 1px 4px; letter-spacing: 0.04em; }
   .side-projects .preview.trek .trek-agents span::before { display: none; }
 
-  /* Page-break controls */
+  .side-projects .preview.iron { height: 66px; padding: 6px 9px; gap: 2px; }
+  .side-projects .preview.iron .iron-line { font-size: 7.5px; line-height: 1.3; }
+
+  .side-projects .preview.olympics { height: 66px; padding: 6px 9px; gap: 4px; }
+  .side-projects .preview.olympics .oly-title { font-size: 8px; }
+
+  /* ── ROADMAP ── tighter */
+  .rm-banner { padding: 11px 16px; gap: 6px; margin-bottom: 9px; }
+  .rm-stats { gap: 20px; }
+  .rm-stats > span { font-size: 9px; gap: 5px; }
+  .rm-stats > span strong { font-size: 20px; letter-spacing: -0.02em; }
+  .rm-tagline { font-size: 10px; letter-spacing: -0.003em; line-height: 1.45; }
+  .rm-phases { grid-template-columns: repeat(6, 1fr); margin-bottom: 9px; }
+  .rm-phase { padding: 7px 8px 7px 11px; gap: 2px; }
+  .rm-phase { border-right: 1px solid var(--line-soft); border-bottom: none; }
+  .rm-phase:last-child { border-right: none; }
+  .rm-phase::after { display: block; width: 6px; height: 6px; right: -4px; }
+  .rm-phase:last-child::after { display: none; }
+  .rm-phase-mo { font-size: 7px; letter-spacing: 0.05em; }
+  .rm-phase-name { font-size: 9.5px; line-height: 1.15; }
+  .rm-workstreams { grid-template-columns: 1fr 1fr; margin-bottom: 7px; }
+  .rm-ws { padding: 7px 11px; gap: 2px; border-right: 1px solid var(--line-soft); }
+  .rm-ws:nth-child(2n) { border-right: none; }
+  .rm-ws:nth-last-child(-n+2) { border-bottom: none; }
+  .rm-ws-name { font-size: 10.5px; letter-spacing: -0.01em; }
+  .rm-ws-tag { font-size: 6.5px; padding: 1px 4px; letter-spacing: 0.1em; }
+  .rm-ws-scope { font-size: 8.5px; line-height: 1.32; }
+  .rm-ws-scope em { font-size: 8.5px; }
+  .rm-always-on { font-size: 8.5px; line-height: 1.4; padding-left: 10px; page-break-inside: avoid; break-inside: avoid; }
+  .rm-always-on strong { font-size: 7.5px; margin-bottom: 2px; letter-spacing: 0.12em; }
+
+  /* ── EXPERIENCE ── compact resume style */
+  .exp { grid-template-columns: 130px 1fr; gap: 12px; padding: 5px 0 6px; }
+  .exp-meta { flex-direction: column; gap: 2px; padding-top: 2px; font-size: 8.5px; }
+  .exp-co { font-size: 13px; letter-spacing: -0.012em; line-height: 1.15; }
+  .exp-co .ticker { font-size: 8.5px; margin-left: 4px; vertical-align: 2px; }
+  .exp-title { font-size: 10.5px; margin-top: 2px; margin-bottom: 4px; }
+  .exp-title .promo { font-size: 8px; margin-left: 5px; }
+  .exp-pillar { font-size: 8.5px; letter-spacing: 0.13em; margin: 5px 0 2px; }
+  .bullets li { font-size: 10.5px; line-height: 1.38; margin-bottom: 2px; padding-left: 14px; }
+  .bullets li::before { top: 6px; width: 6px; }
+  .bullets li .num { font-size: 10px; }
+
+  /* ── EDUCATION ── compact 3-col, tight */
+  .edu-grid { grid-template-columns: 1fr 1fr 1fr; }
+  .edu-item { border-right: 1px solid var(--line-soft); border-bottom: none; padding: 1px 14px 1px 0; }
+  .edu-item:last-child { border-right: none; padding-right: 0; }
+  .edu-item:not(:first-child) { padding-left: 14px; }
+  .edu-school { font-size: 10.5px; letter-spacing: -0.01em; margin-bottom: 1px; }
+  .edu-deg { font-size: 9px; margin-bottom: 1px; }
+  .edu-year { font-size: 8px; }
+
+  /* ── FOOTER ── tight, glued to previous content */
+  .footer-note { flex-direction: row; margin-top: 6px; padding-top: 5px; font-size: 8.5px; page-break-before: avoid; break-before: avoid; }
+  .footer-note em { font-size: 9.5px; }
+  .footer-note .build-stamp::before { width: 12px; }
+
+  /* ── PAGE-BREAK CONTROLS ── */
   .work-card,
   .project-card,
   .exp,
   .rm-banner,
   .rm-phases,
   .rm-workstreams,
+  .rm-always-on,
+  .bottom-block,
   .metrics { page-break-inside: avoid; break-inside: avoid; }
   .section-head,
   .bwc-section-label,
@@ -1303,7 +1530,8 @@ html, body {
 
     <!-- HNGE vs OMDA -->
     <div class="work-card">
-      <div class="preview hnge">
+      <div class="preview hnge preview-clickable" data-doc="hnge-omda" data-doc-title="HNGE vs OMDA — Public-Company Benchmarking">
+        <span class="preview-hint">View doc</span>
         <div class="hnge-head">
           <span class="hnge-tick t-hnge">HNGE</span>
           <span class="hnge-vs">VS</span>
@@ -1378,7 +1606,8 @@ html, body {
 
     <!-- FDE RECRUITING SITE -->
     <div class="work-card">
-      <div class="preview fde">
+      <div class="preview fde preview-clickable" data-doc="fde" data-doc-title="Forward Deployed AI Engineer — Recruiting Site">
+        <span class="preview-hint">View site</span>
         <div class="fde-eyebrow">Omada Health · Office of the CFO</div>
         <div class="fde-headline">The first AI engineer inside a public company's <em>Finance</em> function.</div>
         <div class="fde-pills">
@@ -1670,38 +1899,24 @@ html, body {
       </div>
     </div>
 
-    <!-- SEATTLE SURGERY -->
+    <!-- EARLIER CAREER -->
     <div class="exp">
       <div class="exp-meta">
-        <span class="exp-dates">Nov 2012 — Jul 2016</span>
-        <span class="exp-loc">Seattle, WA</span>
+        <span class="exp-dates">2008 — 2016</span>
+        <span class="exp-loc">Earlier</span>
       </div>
       <div class="exp-body">
-        <div class="exp-co">Seattle Surgery Center <span class="ticker">PROLIANCE</span></div>
-        <div class="exp-title">Finance Director</div>
+        <div class="exp-co">Earlier Career</div>
         <ul class="bullets">
-          <li>Led team of 11 across the full <span class="num">$55M+</span> revenue cycle for one of the nation's top-decile (90th percentile by case volume) ambulatory surgery centers.</li>
-          <li>Drove <span class="num">+174%</span> annual improvement in revenue collected on or before date of service through restructured pre-service patient communications and accountability frameworks.</li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- PROVIDENCE -->
-    <div class="exp">
-      <div class="exp-meta">
-        <span class="exp-dates">Jul 2008 — Nov 2012</span>
-        <span class="exp-loc">Renton, WA</span>
-      </div>
-      <div class="exp-body">
-        <div class="exp-co">Providence Health &amp; Services</div>
-        <div class="exp-title">Senior Financial Analyst · Financial Analyst</div>
-        <ul class="bullets">
-          <li>Led <span class="num">$200M</span> zero-based operating budget process for administrative departments across a 34-hospital West Coast health system; developed Activity-Based Costing metrics and contributed to the Long-Range Financial Plan and capital prioritization.</li>
+          <li><strong>Seattle Surgery Center</strong> <span class="ticker">PROLIANCE</span> · <em>Finance Director</em> · 2012–2016</li>
+          <li><strong>Providence Health &amp; Services</strong> · <em>Sr Financial Analyst · Financial Analyst</em> · 2008–2012</li>
         </ul>
       </div>
     </div>
 
   </section>
+
+  <div class="bottom-block">
 
   <!-- ═══════════════════════════════ EDUCATION ═══════════════════════════════ -->
   <section class="section">
@@ -1738,6 +1953,84 @@ html, body {
     </div>
   </div>
 
+  </div><!-- /bottom-block -->
+
 </div>
+
+<!-- ═══════════════════════════════ DOC MODAL ═══════════════════════════════ -->
+<div class="doc-modal" id="doc-modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="doc-modal-title">
+  <div class="doc-modal-shell">
+    <div class="doc-modal-bar">
+      <span class="doc-modal-title" id="doc-modal-title">Document</span>
+      <div class="doc-modal-actions">
+        <a class="doc-modal-link" id="doc-modal-newtab" href="#" target="_blank" rel="noopener">Open in new tab ↗</a>
+        <button class="doc-modal-close" id="doc-modal-close" aria-label="Close">×</button>
+      </div>
+    </div>
+    <iframe class="doc-modal-frame" id="doc-modal-frame" title="Document preview" src="about:blank"></iframe>
+  </div>
+</div>
+
+<script>
+(function() {
+  var DOC_MAP = {
+    'hnge-omda': 'docs/hnge-omda.html',
+    'fde': 'docs/fde/index.html'
+  };
+
+  var modal = document.getElementById('doc-modal');
+  var frame = document.getElementById('doc-modal-frame');
+  var titleEl = document.getElementById('doc-modal-title');
+  var newTabLink = document.getElementById('doc-modal-newtab');
+  var closeBtn = document.getElementById('doc-modal-close');
+
+  function openModal(docKey, docTitle) {
+    var url = DOC_MAP[docKey];
+    if (!url) return;
+    titleEl.textContent = docTitle || 'Document';
+    frame.src = url;
+    newTabLink.href = url;
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('modal-open');
+  }
+
+  function closeModal() {
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('modal-open');
+    // Defer src clear so the close transition feels clean
+    setTimeout(function() { frame.src = 'about:blank'; }, 280);
+  }
+
+  // Wire clickable previews
+  document.querySelectorAll('.preview-clickable').forEach(function(el) {
+    el.addEventListener('click', function() {
+      openModal(el.getAttribute('data-doc'), el.getAttribute('data-doc-title'));
+    });
+    el.setAttribute('role', 'button');
+    el.setAttribute('tabindex', '0');
+    el.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openModal(el.getAttribute('data-doc'), el.getAttribute('data-doc-title'));
+      }
+    });
+  });
+
+  closeBtn.addEventListener('click', closeModal);
+
+  // Click backdrop to close
+  modal.addEventListener('click', function(e) {
+    if (e.target === modal) closeModal();
+  });
+
+  // ESC to close
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && modal.classList.contains('open')) closeModal();
+  });
+})();
+</script>
+
 </body>
 </html>
